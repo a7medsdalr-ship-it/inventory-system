@@ -53,7 +53,7 @@
   "inv_warehouses": [
     {
       "id": "wh1_fixed_id",
-      "name": "مخزن 1",
+      "name": "مخزن المشتريات المحلية",
       "categoryIds": [
         "cat_1",
         "cat_2",
@@ -65,11 +65,12 @@
         "cat_8",
         "cat_9",
         "cat_10"
-      ]
+      ],
+      "description": "المخزن الرئيسي للمشتريات المحلية وتوريدات الموردين المحليين"
     },
     {
       "id": "wh2_fixed_id",
-      "name": "مخزن 2",
+      "name": "مخزن المشتريات الخارجية",
       "categoryIds": [
         "cat_wh2_syrup",
         "cat_wh2_topping",
@@ -80,7 +81,8 @@
         "cat_wh2_dairy",
         "cat_wh2_coffee",
         "cat_wh2_tea"
-      ]
+      ],
+      "description": "مخزن المشتريات والتوريدات الخارجية والاستيراد"
     }
   ],
   "inv_categories": [

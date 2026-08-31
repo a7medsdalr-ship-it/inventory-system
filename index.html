@@ -129,15 +129,15 @@
                             <button type="button" onclick="selectInventoryNavTab('warehouse-1-tab')" class="w-full text-start p-2.5 rounded-xl hover:bg-indigo-50 text-xs font-bold text-slate-800 flex items-center gap-2.5 transition group cursor-pointer">
                                 <span class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-black group-hover:bg-indigo-600 group-hover:text-white transition">🏬</span>
                                 <div>
-                                    <span class="block font-black text-slate-900">مخزن 1</span>
-                                    <span class="block text-[10px] text-slate-400 font-normal">المخزن الرئيسي الأول</span>
+                                    <span class="block font-black text-slate-900">مخزن المشتريات المحلية</span>
+                                    <span class="block text-[10px] text-slate-400 font-normal">المخزن الرئيسي للمشتريات المحلية</span>
                                 </div>
                             </button>
                             <button type="button" onclick="selectInventoryNavTab('warehouse-2-tab')" class="w-full text-start p-2.5 rounded-xl hover:bg-purple-50 text-xs font-bold text-slate-800 flex items-center gap-2.5 transition group cursor-pointer">
                                 <span class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-sm font-black group-hover:bg-purple-600 group-hover:text-white transition">🏢</span>
                                 <div>
-                                    <span class="block font-black text-slate-900">مخزن 2</span>
-                                    <span class="block text-[10px] text-slate-400 font-normal">المخزن الفرعي الثاني</span>
+                                    <span class="block font-black text-slate-900">مخزن المشتريات الخارجية</span>
+                                    <span class="block text-[10px] text-slate-400 font-normal">مخزن المشتريات والتوريدات الخارجية</span>
                                 </div>
                             </button>
                             <button type="button" onclick="selectInventoryNavTab('shelves-tab')" class="w-full text-start p-2.5 rounded-xl hover:bg-amber-50 text-xs font-bold text-slate-800 flex items-center gap-2.5 transition group cursor-pointer">
@@ -411,8 +411,8 @@
                             <!-- Warehouse / Destination Filter -->
                             <select id="ext-filter-warehouse" onchange="renderExternalPurchasesTab()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:bg-white">
                                 <option value="all">🏬 جميع المخازن المستلمة</option>
-                                <option value="wh1">مخزن 1</option>
-                                <option value="wh2">مخزن 2</option>
+                                <option value="wh1">مخزن المشتريات المحلية</option>
+                                <option value="wh2">مخزن المشتريات الخارجية</option>
                                 <option value="tahnah">محل طحنه</option>
                                 <option value="katheeb">محل كثيب</option>
                                 <option value="zafal">محل زعفل</option>
@@ -541,14 +541,14 @@
                 </div>
             </div>
 
-            <!-- ================= 4a. WAREHOUSE 1 TAB (مخزن 1) ================= -->
+            <!-- ================= 4a. WAREHOUSE 1 TAB (مخزن المشتريات المحلية) ================= -->
             <div id="warehouse-1-tab" class="tab-pane hidden space-y-6">
                 <div class="space-y-6" id="warehouse-1-container">
                     <!-- Injected by JS -->
                 </div>
             </div>
 
-            <!-- ================= 4b. WAREHOUSE 2 TAB (مخزن 2) ================= -->
+            <!-- ================= 4b. WAREHOUSE 2 TAB (مخزن المشتريات الخارجية) ================= -->
             <div id="warehouse-2-tab" class="tab-pane hidden space-y-6">
                 <div class="space-y-6" id="warehouse-2-container">
                     <!-- Injected by JS -->
@@ -796,13 +796,13 @@
                 <!-- 3 Major Section Selector Tabs -->
                 <div class="flex items-center gap-2 p-1.5 bg-slate-100/90 rounded-2xl mb-6 border border-slate-200 overflow-x-auto">
                     <button type="button" onclick="switchStocktakeSection('wh1')" id="st-main-tab-wh1" class="st-section-tab active px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm transition flex items-center gap-2 bg-white text-indigo-900 shadow-2xs">
-                        <span>🏬</span> <span>جرد المخزن 1</span>
+                        <span>🏬</span> <span>جرد المخزن المشتريات المحلية</span>
                     </button>
                     <button type="button" onclick="switchStocktakeSection('shelves')" id="st-main-tab-shelves" class="st-section-tab px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition flex items-center gap-2">
                         <span>📋</span> <span>جرد رفوف الأفرع</span>
                     </button>
                     <button type="button" onclick="switchStocktakeSection('wh2')" id="st-main-tab-wh2" class="st-section-tab px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition flex items-center gap-2">
-                        <span>🏬</span> <span>جرد مخزن 2</span>
+                        <span>🏬</span> <span>جرد مخزن المشتريات الخارجية</span>
                     </button>
                 </div>
 
@@ -813,9 +813,9 @@
                         <div class="p-3.5 bg-indigo-50/80 border-b border-indigo-100 flex flex-col sm:flex-row justify-between sm:items-center gap-2 text-xs sm:text-sm font-bold text-indigo-900">
                             <div class="flex items-center gap-2">
                                 <span class="w-7 h-7 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">🏬</span>
-                                <span id="st-wh1-month-label">كشف جرد مواد مخزن 1 - لشهر: أغسطس 2026</span>
+                                <span id="st-wh1-month-label">كشف جرد مواد مخزن المشتريات المحلية - لشهر: أغسطس 2026</span>
                             </div>
-                            <span class="text-slate-500 font-medium text-xs">💡 جرد المخزن 1: مقارنة المسجل بالنظام مع الموجود في أرض الواقع</span>
+                            <span class="text-slate-500 font-medium text-xs">💡 جرد المخزن المشتريات المحلية: مقارنة المسجل بالنظام مع الموجود في أرض الواقع</span>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-slate-200 text-xs sm:text-sm">
@@ -848,7 +848,7 @@
                         <div class="p-3.5 bg-amber-50/80 border-b border-amber-100 flex flex-col sm:flex-row justify-between sm:items-center gap-2 text-xs sm:text-sm font-bold text-amber-950">
                             <div class="flex items-center gap-2">
                                 <span class="w-7 h-7 rounded-xl bg-amber-600 text-white flex items-center justify-center font-bold text-xs">📋</span>
-                                <span id="st-shelf-active-label">كشف جرد رف طحنه (شامل كافة مواد مخزن 1 ومخزن 2)</span>
+                                <span id="st-shelf-active-label">كشف جرد رف طحنه (شامل كافة مواد مخزن المشتريات المحلية ومخزن المشتريات الخارجية)</span>
                             </div>
                             <span class="text-slate-500 font-medium text-xs">💡 ينقل فائض هذا الرف تلقائياً إلى رصيد بداية الشهر التالي للفرع نفسه</span>
                         </div>
@@ -882,9 +882,9 @@
                         <div class="p-3.5 bg-indigo-50/80 border-b border-indigo-100 flex flex-col sm:flex-row justify-between sm:items-center gap-2 text-xs sm:text-sm font-bold text-indigo-900">
                             <div class="flex items-center gap-2">
                                 <span class="w-7 h-7 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">🏬</span>
-                                <span id="st-wh2-month-label">كشف جرد مواد مخزن 2 - لشهر: أغسطس 2026</span>
+                                <span id="st-wh2-month-label">كشف جرد مواد مخزن المشتريات الخارجية - لشهر: أغسطس 2026</span>
                             </div>
-                            <span class="text-slate-500 font-medium text-xs">💡 جرد مخزن 2: مقارنة المسجل بالنظام مع الموجود في أرض الواقع</span>
+                            <span class="text-slate-500 font-medium text-xs">💡 جرد مخزن المشتريات الخارجية: مقارنة المسجل بالنظام مع الموجود في أرض الواقع</span>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-slate-200 text-xs sm:text-sm">
@@ -1289,10 +1289,10 @@
                         </div>
                     </div>
 
-                    <!-- DUAL THRESHOLDS FOR WAREHOUSE 2 (مخزن 2) -->
+                    <!-- DUAL THRESHOLDS FOR WAREHOUSE 2 (مخزن المشتريات الخارجية) -->
                     <div id="raw-dual-thresholds-wh2" class="hidden bg-purple-50/80 border border-purple-200 rounded-2xl p-3.5 space-y-3">
                         <div class="flex items-center gap-1.5 text-xs font-black text-purple-900 border-b border-purple-200 pb-1.5">
-                            <span>🏢</span> <span>حدود التنبيه الخاصة بـ (مخزن 2):</span>
+                            <span>🏢</span> <span>حدود التنبيه الخاصة بـ (مخزن المشتريات الخارجية):</span>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
                             <div>
@@ -1333,8 +1333,8 @@
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">الموقع / المخزن / الفرع التابع له *</label>
                         <select id="prod-pkg-location-select" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-bold text-indigo-900">
-                            <option value="wh1">🏢 مخزن 1</option>
-                            <option value="wh2">🏢 مخزن 2</option>
+                            <option value="wh1">🏢 مخزن المشتريات المحلية</option>
+                            <option value="wh2">🏢 مخزن المشتريات الخارجية</option>
                             <option value="tahnah">🏪 فرع طحنه</option>
                             <option value="katheeb">🏪 فرع كثيب</option>
                             <option value="zafal">🏪 فرع زعفل</option>
@@ -1382,7 +1382,7 @@
                 <input type="hidden" id="wh-id">
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">اسم المخزن</label>
-                    <input type="text" id="wh-name" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-bold" placeholder="مثال: مخزن 1" required>
+                    <input type="text" id="wh-name" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-bold" placeholder="مثال: مخزن المشتريات المحلية" required>
                 </div>
                 <div>
                     <label class="block font-bold text-slate-700 mb-2">الفئات المخصصة لهذا المخزن:</label>
@@ -1406,7 +1406,7 @@
                 <span class="text-2xl">🏷️</span>
                 <div>
                     <h3 class="text-lg font-bold text-slate-900" data-i18n="btnManageCategories">إدارة فئات المنتجات</h3>
-                    <p class="text-xs text-slate-500">إضافة وتعديل وحذف وتوزيع الفئات على مخزن 1 ومخزن 2</p>
+                    <p class="text-xs text-slate-500">إضافة وتعديل وحذف وتوزيع الفئات على مخزن المشتريات المحلية ومخزن المشتريات الخارجية</p>
                 </div>
             </div>
             
@@ -1424,10 +1424,10 @@
             <!-- Separated Warehouse Category Tabs inside Modal -->
             <div class="flex border-b border-slate-200 mb-3 gap-2">
                 <button type="button" onclick="switchCategoryModalWhTab('wh1_fixed_id')" id="cat-modal-tab-wh1" class="px-4 py-2 text-xs sm:text-sm font-black border-b-2 border-indigo-600 text-indigo-600 flex items-center gap-1.5 transition cursor-pointer">
-                    <span>🏬</span> <span>فئات مخزن 1</span> <span id="cat-count-wh1" class="px-2 py-0.5 rounded-full text-[10px] bg-indigo-100 text-indigo-800">10</span>
+                    <span>🏬</span> <span>فئات مخزن المشتريات المحلية</span> <span id="cat-count-wh1" class="px-2 py-0.5 rounded-full text-[10px] bg-indigo-100 text-indigo-800">10</span>
                 </button>
                 <button type="button" onclick="switchCategoryModalWhTab('wh2_fixed_id')" id="cat-modal-tab-wh2" class="px-4 py-2 text-xs sm:text-sm font-bold text-slate-500 hover:text-slate-700 flex items-center gap-1.5 transition cursor-pointer">
-                    <span>🏢</span> <span>فئات مخزن 2</span> <span id="cat-count-wh2" class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800">9</span>
+                    <span>🏢</span> <span>فئات مخزن المشتريات الخارجية</span> <span id="cat-count-wh2" class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800">9</span>
                 </button>
             </div>
 
@@ -1469,7 +1469,7 @@
                     📦
                 </div>
                 <div>
-                    <h3 class="text-lg font-black text-slate-900">سحب من مخزن 2 إلى رف المحل</h3>
+                    <h3 class="text-lg font-black text-slate-900">سحب من مخزن المشتريات الخارجية إلى رف المحل</h3>
                     <p class="text-xs text-slate-500">نقل وتزويد رفوف المحلات (طحنه، كثيب، زعفل) بالمواد والمستلزمات</p>
                 </div>
             </div>
@@ -1510,7 +1510,7 @@
 
                 <!-- Select Item from Warehouse 2 -->
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">📦 المادة / المنتج المطلوب سحبه من مخزن 2 *</label>
+                    <label class="block font-bold text-slate-700 mb-1">📦 المادة / المنتج المطلوب سحبه من مخزن المشتريات الخارجية *</label>
                     <select id="transfer-item-select" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-bold text-slate-800 text-xs sm:text-sm" required onchange="updateTransferItemDetails()">
                         <!-- Populated dynamically with Warehouse 2 items -->
                     </select>
@@ -2202,11 +2202,11 @@
                         <div class="flex items-center gap-2">
                             <span class="text-xl">🏢</span>
                             <div>
-                                <span class="block font-black text-xs text-purple-950">المستودع المستهدف: مخزن 2 (الفرعي)</span>
-                                <span class="block text-[10px] text-purple-700 font-medium">اختر الفئة ثم اختر المنتج المخصص لمخزن 2 مباشرة</span>
+                                <span class="block font-black text-xs text-purple-950">المستودع المستهدف: مخزن المشتريات الخارجية (الفرعي)</span>
+                                <span class="block text-[10px] text-purple-700 font-medium">اختر الفئة ثم اختر المنتج المخصص لمخزن المشتريات الخارجية مباشرة</span>
                             </div>
                         </div>
-                        <span class="badge-pill bg-purple-200 text-purple-900 font-black text-[11px]">مخزن 2 فقط 🏢</span>
+                        <span class="badge-pill bg-purple-200 text-purple-900 font-black text-[11px]">مخزن المشتريات الخارجية فقط 🏢</span>
                     </div>
 
                     <!-- Category & Product Dynamic Selectors -->
@@ -2214,20 +2214,20 @@
                         <!-- Category Column -->
                         <div>
                             <label class="block text-xs font-black text-slate-800 mb-1.5 flex items-center gap-1">
-                                <span>📁</span> <span>1. فئة المنتج في مخزن 2 *</span>
+                                <span>📁</span> <span>1. فئة المنتج في مخزن المشتريات الخارجية *</span>
                             </label>
                             <select id="ext-pur-category-select" onchange="onExternalPurchaseCategoryChange(this.value)" class="w-full bg-white border-2 border-purple-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-bold text-slate-800 focus:border-indigo-600 transition shadow-2xs cursor-pointer">
-                                <option value="all">📂 جميع فئات مخزن 2</option>
+                                <option value="all">📂 جميع فئات مخزن المشتريات الخارجية</option>
                             </select>
                         </div>
 
                         <!-- Product Column -->
                         <div>
                             <label class="block text-xs font-black text-slate-800 mb-1.5 flex items-center gap-1">
-                                <span>📦</span> <span>2. المنتج / المادة من مخزن 2 *</span>
+                                <span>📦</span> <span>2. المنتج / المادة من مخزن المشتريات الخارجية *</span>
                             </label>
                             <select id="ext-pur-item-select" onchange="onExternalPurchaseProductSelectChange(this.value)" required class="w-full bg-white border-2 border-purple-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-bold text-slate-800 focus:border-indigo-600 transition shadow-2xs cursor-pointer">
-                                <option value="">-- اضغط لاختيار منتج من مخزن 2 --</option>
+                                <option value="">-- اضغط لاختيار منتج من مخزن المشتريات الخارجية --</option>
                             </select>
                         </div>
                     </div>
@@ -2354,8 +2354,8 @@
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">المخزن المستلم لتوريد البضاعة *</label>
                     <select id="ext-rec-target-wh" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-800 focus:bg-white focus:border-emerald-600 transition">
-                        <option value="wh2" selected>🏢 مخزن 2 (الفرعي)</option>
-                        <option value="wh1">🏬 مخزن 1 (الرئيسي)</option>
+                        <option value="wh2" selected>🏢 مخزن المشتريات الخارجية (الفرعي)</option>
+                        <option value="wh1">🏬 مخزن المشتريات المحلية (الرئيسي)</option>
                         <option value="tahnah">🏪 محل طحنه</option>
                         <option value="katheeb">🏪 محل كثيب</option>
                         <option value="zafal">🏪 محل زعفل</option>
@@ -2456,15 +2456,15 @@
                     <button type="button" onclick="closeMobileDrawer(); selectInventoryNavTab('warehouse-1-tab');" class="w-full p-2.5 rounded-xl bg-slate-50 hover:bg-indigo-50 text-start font-bold text-xs text-slate-800 flex items-center gap-2.5 transition cursor-pointer">
                         <span class="text-sm">🏬</span>
                         <div>
-                            <span class="block font-black">مخزن 1</span>
-                            <span class="block text-[10px] text-slate-400">فحص وجرد مخزن 1</span>
+                            <span class="block font-black">مخزن المشتريات المحلية</span>
+                            <span class="block text-[10px] text-slate-400">فحص وجرد مخزن المشتريات المحلية</span>
                         </div>
                     </button>
                     <button type="button" onclick="closeMobileDrawer(); selectInventoryNavTab('warehouse-2-tab');" class="w-full p-2.5 rounded-xl bg-slate-50 hover:bg-purple-50 text-start font-bold text-xs text-slate-800 flex items-center gap-2.5 transition cursor-pointer">
                         <span class="text-sm">🏢</span>
                         <div>
-                            <span class="block font-black">مخزن 2</span>
-                            <span class="block text-[10px] text-slate-400">فحص وجرد مخزن 2</span>
+                            <span class="block font-black">مخزن المشتريات الخارجية</span>
+                            <span class="block text-[10px] text-slate-400">فحص وجرد مخزن المشتريات الخارجية</span>
                         </div>
                     </button>
                     <button type="button" onclick="closeMobileDrawer(); selectInventoryNavTab('shelves-tab');" class="w-full p-2.5 rounded-xl bg-slate-50 hover:bg-amber-50 text-start font-bold text-xs text-slate-800 flex items-center gap-2.5 transition cursor-pointer">
@@ -2528,10 +2528,10 @@
         </button>
     </div>
 
-    <!-- Scripts (Cache-Busted v3.5) -->
-    <script src="js/store.js?v=3.5"></script>
-    <script src="js/seed.js?v=3.5"></script>
-    <script src="js/i18n.js?v=3.5"></script>
-    <script src="js/app.js?v=3.5"></script>
+    <!-- Scripts (Cache-Busted v3.6) -->
+    <script src="js/store.js?v=3.6"></script>
+    <script src="js/seed.js?v=3.6"></script>
+    <script src="js/i18n.js?v=3.6"></script>
+    <script src="js/app.js?v=3.6"></script>
 </body>
 </html>
