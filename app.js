@@ -1632,8 +1632,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const whNameMap = {
-            'wh1': '🏬 مخزن 1',
-            'wh2': '🏢 مخزن 2',
+            'wh1': '🏬 مخزن المشتريات المحلية',
+            'wh2': '🏢 مخزن المشتريات الخارجية',
             'tahnah': '🏪 طحنه',
             'katheeb': '🏪 كثيب',
             'zafal': '🏪 زعفل'
@@ -1704,7 +1704,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         </div>
                     </td>
                     <td class="px-4 py-3.5">
-                        <span class="badge-pill bg-slate-100 text-slate-800 font-bold text-[11px]">${whNameMap[p.targetWarehouseId] || p.targetWarehouseId || '🏬 مخزن 1'}</span>
+                        <span class="badge-pill bg-slate-100 text-slate-800 font-bold text-[11px]">${whNameMap[p.targetWarehouseId] || p.targetWarehouseId || '🏬 مخزن المشتريات المحلية'}</span>
                     </td>
                     <td class="px-4 py-3.5">${statusBadge}</td>
                     <td class="px-4 py-3.5 text-xs text-slate-500 font-medium">
@@ -1737,7 +1737,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const categories = Store.getCategories() || [];
         const ingredients = (Store.getIngredients() || []).filter(i => !i.archived);
 
-        let targetWh = warehouses.find(w => w.id === 'wh2' || w.id === 'wh2_fixed_id' || w.id === 'n8825cuynmsvn4x9q') || warehouses[1] || { id: 'wh2_fixed_id', name: 'مخزن 2', categoryIds: ["cat_wh2_syrup", "cat_wh2_topping", "cat_wh2_drinkware", "cat_wh2_foodpack", "cat_wh2_dry", "cat_wh2_frozen", "cat_wh2_dairy", "cat_wh2_coffee", "cat_wh2_tea"] };
+        let targetWh = warehouses.find(w => w.id === 'wh2' || w.id === 'wh2_fixed_id' || w.id === 'n8825cuynmsvn4x9q') || warehouses[1] || { id: 'wh2_fixed_id', name: 'مخزن المشتريات الخارجية', categoryIds: ["cat_wh2_syrup", "cat_wh2_topping", "cat_wh2_drinkware", "cat_wh2_foodpack", "cat_wh2_dry", "cat_wh2_frozen", "cat_wh2_dairy", "cat_wh2_coffee", "cat_wh2_tea"] };
 
         // 1. Get all ingredients belonging specifically to Warehouse 2
         let allWh2Ingredients = ingredients.filter(i => {
@@ -1765,7 +1765,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // 3. Populate Category dropdown for Warehouse 2
         catSelect.innerHTML = `
-            <option value="all" ${selectedCatId === 'all' ? 'selected' : ''}>📂 جميع فئات مخزن 2 (${wh2Categories.length} فئة)</option>
+            <option value="all" ${selectedCatId === 'all' ? 'selected' : ''}>📂 جميع فئات مخزن المشتريات الخارجية (${wh2Categories.length} فئة)</option>
             ${wh2Categories.map(c => `<option value="${c.id}" ${c.id === selectedCatId ? 'selected' : ''}>📁 ${c.name}</option>`).join('')}
         `;
 
@@ -1778,11 +1778,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 5. Populate Product dropdown for Warehouse 2
         if (filteredItems.length === 0) {
             prodSelect.innerHTML = `
-                <option value="">-- لا توجد منتجات في هذه الفئة لمخزن 2 --</option>
+                <option value="">-- لا توجد منتجات في هذه الفئة لمخزن المشتريات الخارجية --</option>
             `;
         } else {
             prodSelect.innerHTML = `
-                <option value="">-- اضغط لاختيار منتج من مخزن 2 (${filteredItems.length} منتج متوفر) --</option>
+                <option value="">-- اضغط لاختيار منتج من مخزن المشتريات الخارجية (${filteredItems.length} منتج متوفر) --</option>
                 ${filteredItems.map(i => {
                     const catObj = categories.find(c => c.id === i.categoryId);
                     const catLabel = (selectedCatId === 'all' && catObj) ? `[${catObj.name}] ` : '';
@@ -1924,7 +1924,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (costInput) costInput.value = '';
         toggleExtQuickProductAdd();
         populateExternalPurchaseCategoriesAndProducts(categoryId, newIng.id);
-        showToast(`تمت إضافة المنتج (${prodName}) لمخزن 2 بنجاح! 📦✨`);
+        showToast(`تمت إضافة المنتج (${prodName}) لمخزن المشتريات الخارجية بنجاح! 📦✨`);
     };
 
     window.openAddExternalPurchaseModal = function() {
@@ -1938,7 +1938,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const nameEl = document.getElementById('ext-pur-item-name');
             if (nameEl) nameEl.value = '';
             const titleEl = document.getElementById('ext-modal-title');
-            if (titleEl) titleEl.textContent = 'طلب شراء خارجي جديد (مخزن 2)';
+            if (titleEl) titleEl.textContent = 'طلب شراء خارجي جديد (مخزن المشتريات الخارجية)';
             const dateEl = document.getElementById('ext-pur-order-date');
             if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
             const costEl = document.getElementById('ext-pur-total-cost');
@@ -1977,7 +1977,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             populateExternalPurchaseCategoriesAndProducts(matchedIng ? matchedIng.categoryId : 'all', matchedIng ? matchedIng.id : null);
 
             document.getElementById('ext-pur-id').value = p.id;
-            document.getElementById('ext-modal-title').textContent = 'تعديل طلب شراء خارجي (مخزن 2)';
+            document.getElementById('ext-modal-title').textContent = 'تعديل طلب شراء خارجي (مخزن المشتريات الخارجية)';
             document.getElementById('ext-pur-item-name').value = p.itemName || '';
             document.getElementById('ext-pur-store-name').value = p.storeName || '';
             document.getElementById('ext-pur-store-phone').value = p.storePhone || '';
@@ -2059,7 +2059,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         closeModal('add-external-purchase-modal');
         renderExternalPurchasesTab();
-        showToast(`تم حفظ طلب الشراء الخارجي لمخزن 2 للمنتج (${itemName}) بنجاح! 🚚✅`);
+        showToast(`تم حفظ طلب الشراء الخارجي لمخزن المشتريات الخارجية للمنتج (${itemName}) بنجاح! 🚚✅`);
     });
 
     window.openReceiveExternalPurchaseModal = function(id) {
@@ -2193,8 +2193,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function getProductLocationName(loc) {
         if (!loc) return 'غير محدد';
-        if (loc === 'wh1' || loc === 'wh-1' || loc === 'wh1_fixed_id') return '🏢 مخزن 1';
-        if (loc === 'wh2' || loc === 'wh-2' || loc === 'wh2_fixed_id') return '🏢 مخزن 2';
+        if (loc === 'wh1' || loc === 'wh-1' || loc === 'wh1_fixed_id') return '🏢 مخزن المشتريات المحلية';
+        if (loc === 'wh2' || loc === 'wh-2' || loc === 'wh2_fixed_id') return '🏢 مخزن المشتريات الخارجية';
         if (loc === 'tahnah') return '🏪 فرع طحنه';
         if (loc === 'katheeb') return '🏪 فرع كثيب';
         if (loc === 'zafal') return '🏪 فرع زعفل';
@@ -2286,7 +2286,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 categoryName: cat ? cat.name : 'عام',
                 categoryId: ing.categoryId,
                 locationCode: ing.warehouseId || 'wh1',
-                locationName: wh ? wh.name : 'مخزن 1',
+                locationName: wh ? wh.name : 'مخزن المشتريات المحلية',
                 unit: getI18nText('unit_' + ing.unit) || ing.unit,
                 rawUnit: ing.unit,
                 minThreshold: ing.minThreshold || 5,
@@ -2765,7 +2765,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // ================= 7. INDEPENDENT WAREHOUSE SECTIONS (مخزن 1 & مخزن 2) =================
+    // ================= 7. INDEPENDENT WAREHOUSE SECTIONS (مخزن المشتريات المحلية & مخزن المشتريات الخارجية) =================
     window.whCategoryFilters = window.whCategoryFilters || {};
     window.whSearchQueries = window.whSearchQueries || {};
 
@@ -2791,9 +2791,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         let targetWh = warehouses.find(w => w.id === targetWhId);
         if (!targetWh) {
             if (containerId.includes('1')) {
-                targetWh = warehouses[0] || { id: 'wh1_fixed_id', name: 'مخزن 1', categoryIds: ["cat_1", "cat_2", "cat_3", "cat_4", "cat_5", "cat_6", "cat_7", "cat_8", "cat_9", "cat_10"] };
+                targetWh = warehouses[0] || { id: 'wh1_fixed_id', name: 'مخزن المشتريات المحلية', categoryIds: ["cat_1", "cat_2", "cat_3", "cat_4", "cat_5", "cat_6", "cat_7", "cat_8", "cat_9", "cat_10"] };
             } else {
-                targetWh = warehouses[1] || { id: 'wh2_fixed_id', name: 'مخزن 2', categoryIds: ["cat_wh2_syrup", "cat_wh2_topping", "cat_wh2_drinkware", "cat_wh2_foodpack", "cat_wh2_dry", "cat_wh2_frozen", "cat_wh2_dairy", "cat_wh2_coffee", "cat_wh2_tea"] };
+                targetWh = warehouses[1] || { id: 'wh2_fixed_id', name: 'مخزن المشتريات الخارجية', categoryIds: ["cat_wh2_syrup", "cat_wh2_topping", "cat_wh2_drinkware", "cat_wh2_foodpack", "cat_wh2_dry", "cat_wh2_frozen", "cat_wh2_dairy", "cat_wh2_coffee", "cat_wh2_tea"] };
             }
         }
 
@@ -3035,7 +3035,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                     <span class="px-2.5 py-0.5 rounded-lg text-xs font-black bg-amber-100 text-amber-800">حركات النقل والتعبئة 📦</span>
                                     <h4 class="text-base sm:text-lg font-black text-slate-900">سجل سحب المواد من المخزن إلى رفوف المحلات</h4>
                                 </div>
-                                <p class="text-xs text-slate-500 mt-0.5">متابعة المواد والكميات المسحوبة من مخزن 2 والموزعة على أرفف الفروع (طحنه، كثيب، زعفل)</p>
+                                <p class="text-xs text-slate-500 mt-0.5">متابعة المواد والكميات المسحوبة من مخزن المشتريات الخارجية والموزعة على أرفف الفروع (طحنه، كثيب، زعفل)</p>
                             </div>
                             <button onclick="openTransferShelfModal()" class="bg-amber-500 hover:bg-amber-600 text-white font-black px-4 py-2.5 rounded-xl text-xs sm:text-sm shadow-xs transition flex items-center gap-1.5 cursor-pointer">
                                 <span>➕</span> <span>تسجيل سحب جديد للرف</span>
@@ -3300,7 +3300,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             stockInfo.innerHTML = `
-                <span>📦 الرصيد المسجل بالمخزن 2: <strong class="text-slate-900">${rem} ${unit}</strong></span>
+                <span>📦 الرصيد المسجل بالمخزن المشتريات الخارجية: <strong class="text-slate-900">${rem} ${unit}</strong></span>
                 <span>•</span>
                 <span>🏷️ حد الرف: <strong class="text-amber-800">${shelfThresh} ${unit}</strong></span>
                 <span>•</span>
@@ -3671,7 +3671,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 <th class="px-4 py-3.5">الرف / المحل</th>
                                 <th class="px-4 py-3.5 bg-amber-100/50 text-amber-950 font-black">الكمية على الرف</th>
                                 <th class="px-4 py-3.5">حد الرف الأدنى</th>
-                                <th class="px-4 py-3.5">المتوفر بمخزن 2</th>
+                                <th class="px-4 py-3.5">المتوفر بمخزن المشتريات الخارجية</th>
                                 <th class="px-4 py-3.5">حالة الرف</th>
                                 <th class="px-4 py-3.5 text-center">إجراء السحب</th>
                             </tr>
@@ -3713,7 +3713,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                         <td class="px-4 py-3 font-black text-slate-700 text-xs">${ing.whRemaining} ${unitName}</td>
                                         <td class="px-4 py-3">${statusBadge}</td>
                                         <td class="px-4 py-3 text-center">
-                                            <button onclick="openTransferShelfModal('${ing.id}', '${activeBranch !== 'all' ? activeBranch : 'tahnah'}')" class="text-amber-700 hover:text-amber-900 font-black text-xs cursor-pointer px-3 py-1.5 bg-amber-50 hover:bg-amber-100 rounded-xl border border-amber-200 transition flex items-center justify-center gap-1 mx-auto" title="سحب وتزويد الرف من مخزن 2">
+                                            <button onclick="openTransferShelfModal('${ing.id}', '${activeBranch !== 'all' ? activeBranch : 'tahnah'}')" class="text-amber-700 hover:text-amber-900 font-black text-xs cursor-pointer px-3 py-1.5 bg-amber-50 hover:bg-amber-100 rounded-xl border border-amber-200 transition flex items-center justify-center gap-1 mx-auto" title="سحب وتزويد الرف من مخزن المشتريات الخارجية">
                                                 <span>📦</span> <span>سحب للرف</span>
                                             </button>
                                         </td>
@@ -3732,7 +3732,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 <span class="px-2.5 py-0.5 rounded-lg text-xs font-black bg-amber-100 text-amber-800">حركات النقل والتعبئة 📦</span>
                                 <h4 class="text-base sm:text-lg font-black text-slate-900">سجل سحب وتوريد المواد لرفوف المحلات</h4>
                             </div>
-                            <p class="text-xs text-slate-500 mt-0.5">متابعة كافة عمليات النقل المنفذة من مخزن 2 وتوزيعها على أرفف (طحنه، كثيب، زعفل)</p>
+                            <p class="text-xs text-slate-500 mt-0.5">متابعة كافة عمليات النقل المنفذة من مخزن المشتريات الخارجية وتوزيعها على أرفف (طحنه، كثيب، زعفل)</p>
                         </div>
                         <button onclick="openTransferShelfModal(null, '${activeBranch !== 'all' ? activeBranch : 'tahnah'}')" class="bg-amber-500 hover:bg-amber-600 text-white font-black px-4 py-2.5 rounded-xl text-xs sm:text-sm shadow-xs transition flex items-center gap-1.5 cursor-pointer">
                             <span>➕</span> <span>تسجيل سحب جديد للرف</span>
@@ -3913,7 +3913,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ...i,
                     itemType: 'ingredient',
                     whSource: isWh2 ? 'wh2' : 'wh1',
-                    whName: isWh2 ? 'مخزن 2 (الفرعي)' : 'مخزن 1 (الرئيسي)'
+                    whName: isWh2 ? 'مخزن المشتريات الخارجية (الفرعي)' : 'مخزن المشتريات المحلية (الرئيسي)'
                 };
             }),
             ...archivedProducts.map(p => ({
@@ -3960,8 +3960,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                             </p>
                             <div class="flex flex-wrap items-center gap-2 mt-2 text-xs font-bold">
                                 <span class="badge-pill bg-slate-100 text-slate-700">📦 إجمالي المؤرشف: ${countAll}</span>
-                                <span class="badge-pill bg-indigo-50 text-indigo-700 border border-indigo-200">🏬 مواد مخزن 1: ${countWh1}</span>
-                                <span class="badge-pill bg-purple-50 text-purple-700 border border-purple-200">🏢 مواد مخزن 2: ${countWh2}</span>
+                                <span class="badge-pill bg-indigo-50 text-indigo-700 border border-indigo-200">🏬 مواد مخزن المشتريات المحلية: ${countWh1}</span>
+                                <span class="badge-pill bg-purple-50 text-purple-700 border border-purple-200">🏢 مواد مخزن المشتريات الخارجية: ${countWh2}</span>
                                 <span class="badge-pill bg-emerald-50 text-emerald-700 border border-emerald-200">📦 منتجات وتغليف: ${countProds}</span>
                             </div>
                         </div>
@@ -3982,10 +3982,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                             🌟 جميع المؤرشفات (${countAll})
                         </button>
                         <button onclick="setArchiveFilter('wh1')" class="px-3.5 py-2 rounded-xl transition cursor-pointer whitespace-nowrap ${activeFilter === 'wh1' ? 'bg-indigo-600 text-white shadow-2xs font-black' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'}">
-                            🏬 مخزن 1 (${countWh1})
+                            🏬 مخزن المشتريات المحلية (${countWh1})
                         </button>
                         <button onclick="setArchiveFilter('wh2')" class="px-3.5 py-2 rounded-xl transition cursor-pointer whitespace-nowrap ${activeFilter === 'wh2' ? 'bg-purple-600 text-white shadow-2xs font-black' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'}">
-                            🏢 مخزن 2 (${countWh2})
+                            🏢 مخزن المشتريات الخارجية (${countWh2})
                         </button>
                         <button onclick="setArchiveFilter('products')" class="px-3.5 py-2 rounded-xl transition cursor-pointer whitespace-nowrap ${activeFilter === 'products' ? 'bg-emerald-600 text-white shadow-2xs font-black' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'}">
                             📦 منتجات وتغليف (${countProds})
@@ -4348,12 +4348,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <div>
                             <label class="block font-black text-slate-900 text-xs sm:text-sm mb-1.5">📦 اختيار المنتج / المادة الخام للتحليل والتتبع:</label>
                             <select onchange="setProductReportItem(this.value)" class="w-full bg-white border-2 border-blue-300 rounded-xl p-2.5 font-bold text-slate-900 text-xs sm:text-sm focus:border-blue-600 transition shadow-2xs">
-                                <optgroup label="🏬 مواد مخزن 1 (الرئيسي)">
+                                <optgroup label="🏬 مواد مخزن المشتريات المحلية (الرئيسي)">
                                     ${allIngredients.filter(i => (!i.warehouseId || i.warehouseId === 'wh1_fixed_id' || i.warehouseId === 'wh1')).map(i => `
                                         <option value="${i.id}" ${i.id === item.id ? 'selected' : ''}>🌾 ${i.name} ${i.archived ? '(مؤرشف 🗄️)' : ''}</option>
                                     `).join('')}
                                 </optgroup>
-                                <optgroup label="🏢 مواد مخزن 2 (الفرعي)">
+                                <optgroup label="🏢 مواد مخزن المشتريات الخارجية (الفرعي)">
                                     ${allIngredients.filter(i => (i.warehouseId === 'wh2_fixed_id' || i.warehouseId === 'wh2')).map(i => `
                                         <option value="${i.id}" ${i.id === item.id ? 'selected' : ''}>🏢 ${i.name} ${i.archived ? '(مؤرشف 🗄️)' : ''}</option>
                                     `).join('')}
@@ -4619,7 +4619,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-sm">🚚</span>
                                 <div>
                                     <h4 class="font-black text-slate-900 text-sm sm:text-base">سجل النقل والتوريد لرفوف المحلات (طحنه / كثيب / زعفل)</h4>
-                                    <p class="text-xs text-slate-500">حركات النقل المنفذة من مخزن 2 للأرفف مع فحص المطابقة وأسباب الفروقات</p>
+                                    <p class="text-xs text-slate-500">حركات النقل المنفذة من مخزن المشتريات الخارجية للأرفف مع فحص المطابقة وأسباب الفروقات</p>
                                 </div>
                             </div>
                             <span class="badge-pill bg-amber-50 text-amber-800 font-bold text-xs">إجمالي المنقول: ${totalTransferredQty.toFixed(2)} ${unitName}</span>
@@ -4708,8 +4708,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const warehouses = Store.getWarehouses();
         const ingredients = Store.getIngredients();
 
-        const wh1 = warehouses.find(w => w.id === 'wh1_fixed_id') || warehouses[0] || { id: 'wh1_fixed_id', name: 'مخزن 1', categoryIds: [] };
-        const wh2 = warehouses.find(w => w.id === 'wh2_fixed_id') || warehouses[1] || { id: 'wh2_fixed_id', name: 'مخزن 2', categoryIds: [] };
+        const wh1 = warehouses.find(w => w.id === 'wh1_fixed_id') || warehouses[0] || { id: 'wh1_fixed_id', name: 'مخزن المشتريات المحلية', categoryIds: [] };
+        const wh2 = warehouses.find(w => w.id === 'wh2_fixed_id') || warehouses[1] || { id: 'wh2_fixed_id', name: 'مخزن المشتريات الخارجية', categoryIds: [] };
 
         const wh1Cats = categories.filter(c => wh1.categoryIds && wh1.categoryIds.includes(c.id));
         const wh2Cats = categories.filter(c => wh2.categoryIds && wh2.categoryIds.includes(c.id));
@@ -4740,7 +4740,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (list) {
             const activeCats = isTabWh1 ? wh1Cats : wh2Cats;
-            const currentWhName = isTabWh1 ? 'مخزن 1' : 'مخزن 2';
+            const currentWhName = isTabWh1 ? 'مخزن المشتريات المحلية' : 'مخزن المشتريات الخارجية';
 
             if (activeCats.length === 0) {
                 list.innerHTML = `<div class="p-6 text-center text-xs text-slate-400 font-bold">لا توجد فئات مسجلة في (${currentWhName}) حالياً.</div>`;
@@ -5473,7 +5473,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const wh1Body = document.getElementById('stocktake-wh1-body');
         if (wh1Body) {
             const wh1MonthLabel = document.getElementById('st-wh1-month-label');
-            if (wh1MonthLabel) wh1MonthLabel.textContent = `كشف جرد مواد مخزن 1 فقط - لشهر: ${currentMonth}`;
+            if (wh1MonthLabel) wh1MonthLabel.textContent = `كشف جرد مواد مخزن المشتريات المحلية فقط - لشهر: ${currentMonth}`;
 
             // Strict Filter ingredients for Warehouse 1 ONLY
             const wh1Items = ingredients.filter(i => i.warehouseId === wh1Id);
@@ -5581,7 +5581,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const activeShelfName = shelfNames[activeStocktakeShelf] || 'رف طحنه';
             const activeShelfKey = 'shelf-' + activeStocktakeShelf;
             const shelfLabel = document.getElementById('st-shelf-active-label');
-            if (shelfLabel) shelfLabel.textContent = `كشف جرد ${activeShelfName} (شامل كافة مواد مخزن 1 ومخزن 2)`;
+            if (shelfLabel) shelfLabel.textContent = `كشف جرد ${activeShelfName} (شامل كافة مواد مخزن المشتريات المحلية ومخزن المشتريات الخارجية)`;
 
             // ALL ingredients from Warehouse 1 AND Warehouse 2 together
             shelvesBody.innerHTML = ingredients.map(inv => {
@@ -5613,7 +5613,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const reason = savedItem.reason || '';
                 const isManagerApproved = savedItem.isManagerApproved || false;
 
-                const whName = inv.warehouseId === wh2Id ? 'مخزن 2' : 'مخزن 1';
+                const whName = inv.warehouseId === wh2Id ? 'مخزن المشتريات الخارجية' : 'مخزن المشتريات المحلية';
 
                 return `
                     <tr class="hover:bg-slate-50 transition shelf-stocktake-row" data-ing-id="${inv.id}" data-shelf-key="${activeShelfKey}">
@@ -5661,7 +5661,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const wh2Body = document.getElementById('stocktake-wh2-body');
         if (wh2Body) {
             const wh2MonthLabel = document.getElementById('st-wh2-month-label');
-            if (wh2MonthLabel) wh2MonthLabel.textContent = `كشف جرد مواد مخزن 2 فقط - لشهر: ${currentMonth}`;
+            if (wh2MonthLabel) wh2MonthLabel.textContent = `كشف جرد مواد مخزن المشتريات الخارجية فقط - لشهر: ${currentMonth}`;
 
             // Strict Filter ingredients for Warehouse 2 ONLY
             const wh2Items = ingredients.filter(i => i.warehouseId === wh2Id);
@@ -5922,7 +5922,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Render WH1 & WH2
             ['wh1', 'wh2'].forEach(wk => {
-                const whName = wk === 'wh1' ? 'مخزن 1' : 'مخزن 2';
+                const whName = wk === 'wh1' ? 'مخزن المشتريات المحلية' : 'مخزن المشتريات الخارجية';
                 const data = r.sectionsSnapshot[wk] || {};
                 rowsHtml += `<tr class="bg-indigo-100/60 font-black text-indigo-900"><td colspan="9" class="px-3 py-2 text-start">🏬 ${whName}</td></tr>`;
                 Object.entries(data).forEach(([ingId, item], idx) => {

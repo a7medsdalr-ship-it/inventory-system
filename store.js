@@ -161,12 +161,12 @@ const Store = {
             this._set(this.KEYS.WAREHOUSES, [
                 {
                                 "id": "wh1_fixed_id",
-                                "name": "مخزن 1",
+                                "name": "مخزن المشتريات المحلية",
                                 "categoryIds": ["cat_1", "cat_2", "cat_3", "cat_4", "cat_5", "cat_6", "cat_7", "cat_8", "cat_9", "cat_10"]
                 },
                 {
                                 "id": "wh2_fixed_id",
-                                "name": "مخزن 2",
+                                "name": "مخزن المشتريات الخارجية",
                                 "categoryIds": ["cat_wh2_syrup", "cat_wh2_topping", "cat_wh2_drinkware", "cat_wh2_foodpack", "cat_wh2_dry", "cat_wh2_frozen", "cat_wh2_dairy", "cat_wh2_coffee", "cat_wh2_tea"]
                 }
 ]);
@@ -374,8 +374,8 @@ const Store = {
         let whs = this._get(this.KEYS.WAREHOUSES);
         if (!whs || whs.length === 0 || whs.some(w => w.name.includes('طحنه') || w.name.includes('كثيب') || w.name.includes('زعفل'))) {
             whs = [
-                { id: "wh1_fixed_id", name: "مخزن 1", categoryIds: ["cat_1", "cat_2", "cat_3", "cat_4", "cat_5", "cat_6", "cat_7", "cat_8", "cat_9", "cat_10"] },
-                { id: "wh2_fixed_id", name: "مخزن 2", categoryIds: ["cat_wh2_syrup", "cat_wh2_topping", "cat_wh2_drinkware", "cat_wh2_foodpack", "cat_wh2_dry", "cat_wh2_frozen", "cat_wh2_dairy", "cat_wh2_coffee", "cat_wh2_tea"] }
+                { id: "wh1_fixed_id", name: "مخزن المشتريات المحلية", categoryIds: ["cat_1", "cat_2", "cat_3", "cat_4", "cat_5", "cat_6", "cat_7", "cat_8", "cat_9", "cat_10"] },
+                { id: "wh2_fixed_id", name: "مخزن المشتريات الخارجية", categoryIds: ["cat_wh2_syrup", "cat_wh2_topping", "cat_wh2_drinkware", "cat_wh2_foodpack", "cat_wh2_dry", "cat_wh2_frozen", "cat_wh2_dairy", "cat_wh2_coffee", "cat_wh2_tea"] }
             ];
             this._set(this.KEYS.WAREHOUSES, whs);
         }
