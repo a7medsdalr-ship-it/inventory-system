@@ -1,0 +1,172 @@
+{
+  "inv_employees": [
+    {
+      "id": "admin-ahmed-default",
+      "name": "أحمد بن سعيد",
+      "username": "Ahmed.admin",
+      "password": "aaaaaaaa",
+      "role": "admin",
+      "phone": "91234567",
+      "allowedTabs": [
+        "all"
+      ],
+      "createdAt": "2026-08-31T19:23:46.217Z"
+    }
+  ],
+  "inv_departments": [
+    {
+      "id": "dept_kitchen",
+      "name": "قسم المطبخ والإنتاج",
+      "icon": "🍳",
+      "headId": "",
+      "description": "مسؤول عن تحضير الوصفات، إدارة مقادير الإنتاج وتنفيذ طلبات المطبخ."
+    },
+    {
+      "id": "dept_purchases",
+      "name": "قسم المشتريات والتوريد",
+      "icon": "🛒",
+      "headId": "",
+      "description": "مسؤول عن شراء المواد الخام، الفواتير الاستهلاكية ومتابعة الموردين."
+    },
+    {
+      "id": "dept_warehouse",
+      "name": "قسم إدارة المخازن",
+      "icon": "🏬",
+      "headId": "",
+      "description": "مسؤول عن استلام وتخزين المواد، مراقبة حد الطلب والجرد الدوري."
+    },
+    {
+      "id": "dept_pos",
+      "name": "قسم الفروع والكاشير",
+      "icon": "☕",
+      "headId": "",
+      "description": "مسؤول عن تسجيل الاستهلاك اليومي للوجبات وخدمة الزبائن في الفروع."
+    },
+    {
+      "id": "dept_quality",
+      "name": "قسم الجودة والنظافة",
+      "icon": "🧼",
+      "headId": "",
+      "description": "مسؤول عن مراقبة الصلاحيات، تسجيل التالف ومعايير النظافة."
+    }
+  ],
+  "inv_warehouses": [
+    {
+      "id": "wh1_fixed_id",
+      "name": "مخزن 1",
+      "categoryIds": [
+        "cat_1",
+        "cat_2",
+        "cat_3",
+        "cat_4",
+        "cat_5",
+        "cat_6",
+        "cat_7",
+        "cat_8",
+        "cat_9",
+        "cat_10"
+      ]
+    },
+    {
+      "id": "wh2_fixed_id",
+      "name": "مخزن 2",
+      "categoryIds": [
+        "cat_wh2_syrup",
+        "cat_wh2_topping",
+        "cat_wh2_drinkware",
+        "cat_wh2_foodpack",
+        "cat_wh2_dry",
+        "cat_wh2_frozen",
+        "cat_wh2_dairy",
+        "cat_wh2_coffee",
+        "cat_wh2_tea"
+      ]
+    }
+  ],
+  "inv_categories": [
+    {
+      "id": "cat_1",
+      "name": "مكونات جافة أساسية"
+    },
+    {
+      "id": "cat_2",
+      "name": "زيوت ومواد سائلة"
+    },
+    {
+      "id": "cat_3",
+      "name": "صلصات ومواد جاهزة"
+    },
+    {
+      "id": "cat_4",
+      "name": "مكونات الحلويات والشوكولاتة"
+    },
+    {
+      "id": "cat_5",
+      "name": "مخبوزات وعجائن"
+    },
+    {
+      "id": "cat_6",
+      "name": "فواكه وخضروات طازجة"
+    },
+    {
+      "id": "cat_7",
+      "name": "ألبان ومنتجات مبردة"
+    },
+    {
+      "id": "cat_8",
+      "name": "بروتينات ولحوم"
+    },
+    {
+      "id": "cat_9",
+      "name": "مجمدات"
+    },
+    {
+      "id": "cat_10",
+      "name": "تسالي ومكسرات"
+    },
+    {
+      "id": "cat_11",
+      "name": "تعبئة وتغليف"
+    }
+  ],
+  "inv_external_purchases": [
+    {
+      "itemName": "سيرب فانيليا فرنسي فاخر",
+      "storeName": "مؤسسة التوريد الدولي",
+      "storePhone": "+96894567890",
+      "storeLocation": "مسقط - منطقة الرسيل الصناعية",
+      "quantityRequested": 50,
+      "quantityReceived": 0,
+      "unit": "Liter",
+      "unitPrice": 3.2,
+      "totalCost": 160,
+      "targetWarehouseId": "wh2",
+      "status": "pending",
+      "orderDate": "2026-08-30",
+      "expectedDate": "2026-09-04",
+      "notes": "شحنة طلبيات خاصة لمشروبات الصيف",
+      "id": "ext_pag66zb1omthmmjl7",
+      "createdAt": "2026-08-31T19:23:46.219Z",
+      "addedToStock": false
+    },
+    {
+      "itemName": "بيوريه مانجو طبيعي مركز",
+      "storeName": "متجر الفواكه الطبيعية - دبي",
+      "storePhone": "+971508899112",
+      "storeLocation": "دبي - سوق العوير المركزي",
+      "quantityRequested": 30,
+      "quantityReceived": 15,
+      "unit": "Liter",
+      "unitPrice": 2.8,
+      "totalCost": 84,
+      "targetWarehouseId": "wh2",
+      "status": "partial",
+      "orderDate": "2026-08-28",
+      "expectedDate": "2026-09-02",
+      "notes": "شحن مبرد عبر شركة النقل السريع - بوليصة رقم DXB-9921",
+      "id": "ext_m4upy40yzmthmmjl6",
+      "createdAt": "2026-08-31T19:23:46.218Z",
+      "addedToStock": false
+    }
+  ]
+}
