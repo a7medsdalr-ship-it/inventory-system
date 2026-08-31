@@ -62,41 +62,41 @@
                     </div>
 
                     <!-- User Pill & Controls -->
-                    <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="flex items-center gap-1.5 sm:gap-2.5">
                         <!-- Active User Pill & Switch Account -->
-                        <button type="button" onclick="openModal('login-switch-modal')" class="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 py-1.5 px-3 rounded-xl text-xs sm:text-sm transition group text-start cursor-pointer shadow-2xs" title="تبديل الحساب أو تسجيل الخروج">
+                        <button type="button" onclick="openModal('login-switch-modal')" class="flex items-center gap-1.5 sm:gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 py-1.5 px-2.5 sm:px-3 rounded-xl text-xs transition group text-start cursor-pointer shadow-2xs" title="تبديل الحساب أو تسجيل الخروج">
                             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                             <div>
-                                <span class="text-slate-400 text-[10px] block" data-i18n="userRoleLabel">المستخدم:</span>
-                                <span id="header-user-name" class="font-bold text-slate-800 text-xs sm:text-sm group-hover:text-indigo-600">أحمد بن سعيد</span>
+                                <span class="text-slate-400 text-[9px] sm:text-[10px] block" data-i18n="userRoleLabel">المستخدم:</span>
+                                <span id="header-user-name" class="font-bold text-slate-800 text-[11px] sm:text-xs group-hover:text-indigo-600">أحمد بن سعيد</span>
                             </div>
-                            <span class="text-[11px] bg-indigo-50 text-indigo-700 font-bold px-2 py-0.5 rounded-lg ms-1 hidden sm:inline-block">🔄 تبديل</span>
+                            <span class="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-1.5 py-0.5 rounded-lg ms-0.5 hidden sm:inline-block">🔄</span>
                         </button>
 
-                        <!-- Live Sync Indicator -->
-                        <div id="sync-indicator" class="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 py-1.5 px-2.5 rounded-xl text-xs" title="المزامنة الفورية بين الجوال والكمبيوتر نشطة">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span class="text-[11px] text-emerald-800 font-bold hidden sm:inline">متزامن لحظياً ✅</span>
-                        </div>
-
-                        <!-- Backup / Restore Button -->
-                        <div class="hidden sm:flex items-center gap-1">
-                            <button onclick="exportDatabaseJSON()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-1.5 px-2.5 rounded-xl border border-slate-300 text-xs transition" title="تنزيل نسخة احتياطية من البيانات">
-                                💾 تصدير
+                        <!-- Prominent Backup Download & Restore Group (Right Next to Name) -->
+                        <div class="flex items-center gap-1 bg-amber-50/90 border border-amber-200 p-1 rounded-xl shadow-2xs">
+                            <button onclick="exportDatabaseJSON()" class="bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-black py-1.5 px-2 sm:px-3 rounded-lg text-xs transition flex items-center gap-1 shadow-xs cursor-pointer" title="تنزيل نسخة احتياطية من البيانات">
+                                <span>💾</span> <span>نسخة احتياطية</span>
                             </button>
-                            <label class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-1.5 px-2.5 rounded-xl border border-slate-300 text-xs transition cursor-pointer" title="استيراد نسخة احتياطية">
-                                📥 استيراد
+                            <label class="bg-white hover:bg-amber-100 text-amber-900 font-bold py-1.5 px-2 rounded-lg border border-amber-300 text-xs transition cursor-pointer flex items-center gap-1" title="استيراد واستعادة نسخة احتياطية">
+                                <span>📥</span> <span class="hidden md:inline">استعادة</span>
                                 <input type="file" accept=".json" class="hidden" onchange="importDatabaseJSON(this)">
                             </label>
                         </div>
 
+                        <!-- Live Sync Indicator -->
+                        <div id="sync-indicator" class="hidden lg:flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 py-1.5 px-2.5 rounded-xl text-xs" title="المزامنة الفورية بين الجوال والكمبيوتر نشطة">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span class="text-[11px] text-emerald-800 font-bold">متزامن ✅</span>
+                        </div>
+
                         <!-- Refresh Button -->
-                        <button onclick="Store._syncFromServer().then(() => { renderAll(); showToast('تمت المزامنة الفورية مع السيرفر وتحديث البيانات 🔄'); });" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-1.5 px-3 rounded-xl border border-slate-300 text-xs sm:text-sm transition flex items-center gap-1">
-                            <span>🔄</span> <span class="hidden sm:inline">تحديث ومزامنة</span>
+                        <button onclick="Store._syncFromServer().then(() => { renderAll(); showToast('تمت المزامنة الفورية مع السيرفر وتحديث البيانات 🔄'); });" class="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold py-1.5 px-2.5 rounded-xl border border-slate-300 text-xs transition flex items-center gap-1" title="مزامنة فورية">
+                            <span>🔄</span>
                         </button>
 
                         <!-- Language Toggle -->
-                        <button id="lang-toggle" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold py-1.5 px-3 rounded-xl border border-indigo-200 text-xs sm:text-sm transition">
+                        <button id="lang-toggle" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold py-1.5 px-2.5 rounded-xl border border-indigo-200 text-xs transition">
                             English
                         </button>
                     </div>
@@ -1033,7 +1033,7 @@
     <!-- ================= MODALS ================= -->
 
     <!-- 1. Modal: Multi-Item Balanced Purchase Modal -->
-    <div id="add-purchase-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-3 sm:p-4">
+    <div id="add-purchase-modal" class="fixed inset-0 modal-overlay hidden z-[100] flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl p-6 relative max-h-[92vh] overflow-y-auto">
             <button type="button" onclick="closeModal('add-purchase-modal')" class="absolute top-4 end-4 text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
             <h3 id="pur-modal-title" class="text-lg font-bold mb-3 border-b pb-2 text-slate-900">تسجيل فاتورة مشتريات جديدة (بالريال العماني ر.ع)</h3>
@@ -1091,7 +1091,7 @@
     </div>
 
     <!-- 1.1 Modal: Consumable Purchase Modal -->
-    <div id="add-consumable-purchase-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-3 sm:p-4">
+    <div id="add-consumable-purchase-modal" class="fixed inset-0 modal-overlay hidden z-[100] flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-6 relative max-h-[92vh] overflow-y-auto border border-amber-200">
             <button type="button" onclick="closeModal('add-consumable-purchase-modal')" class="absolute top-4 end-4 text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
             <div class="flex items-center gap-2 mb-3 border-b border-amber-100 pb-2">
@@ -1201,7 +1201,7 @@
     </div>
 
     <!-- 2. Modal: Unified Add / Edit Product (Raw Materials & Packaging Supplies) -->
-    <div id="add-product-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
+    <div id="add-product-modal" class="fixed inset-0 modal-overlay hidden z-[100] flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
             <button type="button" onclick="closeModal('add-product-modal')" class="absolute top-4 end-4 text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
             <h3 id="prod-modal-title" class="text-lg font-bold mb-4 border-b pb-2 text-slate-900" data-i18n="btnAddProduct">إضافة منتج جديد 📦</h3>
@@ -1373,7 +1373,7 @@
     </div>
 
     <!-- 3. Modal: Add / Edit Warehouse -->
-    <div id="add-warehouse-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
+    <div id="add-warehouse-modal" class="fixed inset-0 modal-overlay hidden z-[100] flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto">
             <button type="button" onclick="closeModal('add-warehouse-modal')" class="absolute top-4 end-4 text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
             <h3 class="text-lg font-bold mb-4 border-b pb-2 text-slate-900" data-i18n="btnAddWarehouse">إضافة مخزن جديد وتخصيص الفئات</h3>
@@ -1399,7 +1399,7 @@
     </div>
 
     <!-- 4. Modal: Manage Categories -->
-    <div id="manage-categories-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-3 sm:p-4">
+    <div id="manage-categories-modal" class="fixed inset-0 modal-overlay hidden z-[100] flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
             <button type="button" onclick="closeModal('manage-categories-modal')" class="absolute top-4 end-4 text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
             <div class="flex items-center gap-2 mb-4 border-b pb-2">
@@ -1438,7 +1438,7 @@
     </div>
 
     <!-- 4b. Modal: Edit Category & Warehouse Assignment -->
-    <div id="edit-category-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-3 sm:p-4">
+    <div id="edit-category-modal" class="fixed inset-0 modal-overlay hidden z-[100] flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 relative">
             <button type="button" onclick="closeModal('edit-category-modal')" class="absolute top-4 end-4 text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
             <h3 class="text-lg font-bold mb-3 border-b pb-2 text-slate-900">تعديل بيانات الفئة 🏷️</h3>
@@ -1461,7 +1461,7 @@
     </div>
 
     <!-- 4c. Modal: Transfer from Warehouse 2 to Store Shelf -->
-    <div id="transfer-shelf-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-3 sm:p-4">
+    <div id="transfer-shelf-modal" class="fixed inset-0 modal-overlay hidden z-[100] flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
             <button type="button" onclick="closeModal('transfer-shelf-modal')" class="absolute top-4 end-4 text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
             <div class="flex items-center gap-2.5 mb-4 border-b pb-3">
@@ -1572,7 +1572,7 @@
     </div>
 
     <!-- 5. Modal: Add / Edit Recipe -->
-    <div id="add-recipe-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
+    <div id="add-recipe-modal" class="fixed inset-0 modal-overlay hidden z-[100] flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl p-6 relative max-h-[92vh] overflow-y-auto">
             <button type="button" onclick="closeModal('add-recipe-modal')" class="absolute top-4 end-4 text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
             <h3 class="text-lg font-bold mb-4 border-b pb-2 text-slate-900" data-i18n="modalAddRecipe">إنشاء وصفة منتج جديد</h3>
@@ -1624,7 +1624,7 @@
     </div>
 
     <!-- 6. Modal: Add Production Order -->
-    <div id="add-order-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
+    <div id="add-order-modal" class="fixed inset-0 modal-overlay hidden z-[100] flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto">
             <button type="button" onclick="closeModal('add-order-modal')" class="absolute top-4 end-4 text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
             <h3 class="text-lg font-bold mb-4 border-b pb-2 text-slate-900" data-i18n="btnCreateOrder">إنشاء طلب إنتاج للمطبخ</h3>
@@ -1659,7 +1659,7 @@
     </div>
 
     <!-- 7. Modal: Login / Switch Employee Account -->
-    <div id="login-switch-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-3 sm:p-4">
+    <div id="login-switch-modal" class="fixed inset-0 modal-overlay hidden z-[100] flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-6 relative max-h-[92vh] overflow-y-auto">
             <button type="button" onclick="closeModal('login-switch-modal')" class="absolute top-4 end-4 text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
             <div class="flex items-center gap-2 mb-3 border-b pb-2">
@@ -1723,7 +1723,7 @@
     </div>
 
     <!-- 8. Modal: Add / Edit Department -->
-    <div id="add-department-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-3 sm:p-4">
+    <div id="add-department-modal" class="fixed inset-0 modal-overlay hidden z-[100] flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 relative max-h-[92vh] overflow-y-auto">
             <button type="button" onclick="closeModal('add-department-modal')" class="absolute top-4 end-4 text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
             <h3 id="dept-modal-title" class="text-lg font-bold mb-3 border-b pb-2 text-slate-900">إضافة قسم إداري جديد</h3>
@@ -1762,7 +1762,7 @@
     </div>
 
     <!-- 9. Modal: Add / Edit Employee with Department, Role & Section Permissions -->
-    <div id="add-employee-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-3 sm:p-4">
+    <div id="add-employee-modal" class="fixed inset-0 modal-overlay hidden z-[100] flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-6 relative max-h-[92vh] overflow-y-auto">
             <button type="button" onclick="closeModal('add-employee-modal')" class="absolute top-4 end-4 text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
             <h3 id="emp-modal-title" class="text-lg font-bold mb-3 border-b pb-2 text-slate-900" data-i18n="btnAddEmployee">إضافة / تعديل موظف وصلاحيات الأقسام</h3>
@@ -1906,7 +1906,7 @@
     </div>
 
     <!-- 10. Modal: Add / Edit Task (Assign to Department OR Employee) -->
-    <div id="add-task-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-3 sm:p-4">
+    <div id="add-task-modal" class="fixed inset-0 modal-overlay hidden z-[100] flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 relative max-h-[92vh] overflow-y-auto">
             <button type="button" onclick="closeModal('add-task-modal')" class="absolute top-4 end-4 text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
             <h3 id="task-modal-title" class="text-lg font-bold mb-3 border-b pb-2 text-slate-900" data-i18n="btnAddTask">إسناد وتكليف مهمة جديدة</h3>
@@ -1974,7 +1974,7 @@
     </div>
 
     <!-- 9. Modal: Edit Waste Log (Raw & Recipe) -->
-    <div id="edit-waste-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
+    <div id="edit-waste-modal" class="fixed inset-0 modal-overlay hidden z-[100] flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 relative">
             <button type="button" onclick="closeModal('edit-waste-modal')" class="absolute top-4 end-4 text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
             <h3 class="text-lg font-bold mb-4 border-b pb-2 text-slate-900">تعديل سجل التالف</h3>
@@ -2000,7 +2000,7 @@
     </div>
 
     <!-- 10. Modal: Full Invoice Details & Items Breakdown -->
-    <div id="invoice-details-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-3 sm:p-4">
+    <div id="invoice-details-modal" class="fixed inset-0 modal-overlay hidden z-[100] flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-3xl p-5 sm:p-6 relative max-h-[92vh] flex flex-col border border-slate-200">
             <div class="flex justify-between items-center pb-3 border-b border-slate-200">
                 <div class="flex items-center gap-2">
@@ -2079,7 +2079,7 @@
     </div>
 
     <!-- 10b. Modal: Full Screen Image Zoom Viewer -->
-    <div id="invoice-viewer-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
+    <div id="invoice-viewer-modal" class="fixed inset-0 modal-overlay hidden z-[100] flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl p-4 relative max-h-[95vh] flex flex-col">
             <div class="flex justify-between items-center pb-2 border-b">
                 <h3 class="font-bold text-slate-800 text-sm">صورة الفاتورة بالحجم الكامل 📄</h3>
@@ -2092,7 +2092,7 @@
     </div>
 
     <!-- 11. Modal: Month Rollover Confirmation -->
-    <div id="rollover-confirm-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
+    <div id="rollover-confirm-modal" class="fixed inset-0 modal-overlay hidden z-[100] flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 relative">
             <button type="button" onclick="closeModal('rollover-confirm-modal')" class="absolute top-4 end-4 text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
             <h3 class="text-lg font-bold mb-2 text-slate-900">تأكيد إغلاق الجرد وترحيل الشهر 🚀</h3>
@@ -2110,7 +2110,7 @@
     </div>
 
     <!-- 12. Modal: Stocktake Archive Month Details -->
-    <div id="stocktake-archive-detail-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-3 sm:p-4">
+    <div id="stocktake-archive-detail-modal" class="fixed inset-0 modal-overlay hidden z-[100] flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl p-5 sm:p-6 relative max-h-[92vh] flex flex-col border border-slate-200">
             <div class="flex justify-between items-center pb-3 border-b border-slate-200">
                 <div class="flex items-center gap-2">
@@ -2177,7 +2177,7 @@
     </div>
 
     <!-- ================= MODAL: ADD / EDIT EXTERNAL PURCHASE ================= -->
-    <div id="add-external-purchase-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div id="add-external-purchase-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-[45] hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
         <div class="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto border border-slate-200">
             <div class="flex justify-between items-center pb-3 border-b border-slate-100">
                 <div class="flex items-center gap-2">
@@ -2319,7 +2319,7 @@
     </div>
 
     <!-- ================= MODAL: RECEIVE EXTERNAL PURCHASE ================= -->
-    <div id="receive-external-purchase-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div id="receive-external-purchase-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-[45] hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
         <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto border border-slate-200">
             <div class="flex justify-between items-center pb-3 border-b border-slate-100">
                 <div class="flex items-center gap-2">
@@ -2411,7 +2411,7 @@
     </nav>
 
     <!-- ================= MOBILE SLIDE-UP DRAWER (FULL SECTIONS MENU) ================= -->
-    <div id="mobile-drawer-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden transition-opacity duration-300"></div>
+    <div id="mobile-drawer-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-[45] hidden transition-opacity duration-300"></div>
     
     <div id="mobile-drawer" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl z-50 p-5 drawer-closed max-h-[85vh] overflow-y-auto border-t border-slate-200">
         <!-- Pull Handle Indicator -->
@@ -2430,14 +2430,14 @@
 
         <!-- Quick Floating Mobile Actions -->
         <div class="grid grid-cols-2 gap-2 mb-4">
+            <button onclick="closeMobileDrawer(); openAddProductModal('all')" class="p-3 bg-gradient-to-r from-emerald-600 to-teal-600 active:from-emerald-700 active:to-teal-700 text-white rounded-2xl font-black text-xs flex items-center justify-center gap-1.5 shadow-md col-span-2">
+                <span>➕</span> <span>إضافة منتج / مادة خام جديدة 📦</span>
+            </button>
             <button onclick="closeMobileDrawer(); openModal('add-purchase-modal')" class="p-2.5 bg-indigo-600 active:bg-indigo-700 text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm">
-                <span>➕</span> <span>تسجيل فاتورة شراء</span>
+                <span>🛒</span> <span>تسجيل فاتورة شراء</span>
             </button>
-            <button onclick="closeMobileDrawer(); openModal('add-order-modal')" class="p-2.5 bg-emerald-600 active:bg-emerald-700 text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm">
-                <span>👨‍🍳</span> <span>إنشاء طلب للمطبخ</span>
-            </button>
-            <button onclick="closeMobileDrawer(); openAddExternalPurchaseModal()" class="p-2.5 bg-gradient-to-r from-amber-600 to-orange-600 active:from-amber-700 active:to-orange-700 text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm col-span-2">
-                <span>🚚</span> <span>طلب شراء خارجي جديد</span>
+            <button onclick="closeMobileDrawer(); openAddExternalPurchaseModal()" class="p-2.5 bg-gradient-to-r from-amber-600 to-orange-600 active:from-amber-700 active:to-orange-700 text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm">
+                <span>🚚</span> <span>طلب شراء خارجي</span>
             </button>
         </div>
 
@@ -2474,11 +2474,11 @@
                             <span class="block text-[10px] text-amber-700">أرفف المحلات والفروع</span>
                         </div>
                     </button>
-                    <button type="button" onclick="closeMobileDrawer(); selectInventoryNavTab('products-tab');" class="w-full p-2.5 rounded-xl bg-emerald-50/70 hover:bg-emerald-100 text-start font-bold text-xs text-emerald-900 flex items-center gap-2.5 transition cursor-pointer">
+                    <button type="button" onclick="closeMobileDrawer(); openAddProductModal('all');" class="w-full p-2.5 rounded-xl bg-emerald-50/70 hover:bg-emerald-100 text-start font-bold text-xs text-emerald-900 flex items-center gap-2.5 transition cursor-pointer">
                         <span class="text-sm">📦</span>
                         <div>
-                            <span class="block font-black">إضافة منتج</span>
-                            <span class="block text-[10px] text-emerald-600">دليل المواد الخام والتغليف</span>
+                            <span class="block font-black">+ إضافة منتج جديد</span>
+                            <span class="block text-[10px] text-emerald-600">تسجيل مادة خام أو مستلزم تغليف</span>
                         </div>
                     </button>
                     <button type="button" onclick="closeMobileDrawer(); selectInventoryNavTab('archive-tab');" class="w-full p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-start font-bold text-xs text-slate-800 flex items-center gap-2.5 transition cursor-pointer">
@@ -2528,10 +2528,10 @@
         </button>
     </div>
 
-    <!-- Scripts (Cache-Busted v3.3) -->
-    <script src="js/store.js?v=3.3"></script>
-    <script src="js/seed.js?v=3.3"></script>
-    <script src="js/i18n.js?v=3.3"></script>
-    <script src="js/app.js?v=3.3"></script>
+    <!-- Scripts (Cache-Busted v3.5) -->
+    <script src="js/store.js?v=3.5"></script>
+    <script src="js/seed.js?v=3.5"></script>
+    <script src="js/i18n.js?v=3.5"></script>
+    <script src="js/app.js?v=3.5"></script>
 </body>
 </html>

@@ -1,0 +1,225 @@
+/* Modern Mobile-First Styling with 3 Branch Branding Colors */
+
+:root {
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    
+    /* Branch Colors */
+    --color-tahnah: #78350f;       /* Brown / بني */
+    --color-katheeb: #d97706;      /* Light Brown / بني فاتح */
+    --color-zafal: #16a34a;        /* Light Green / أخضر فاتح */
+}
+
+/* Ensure hidden class always overrides any flex or block display */
+.hidden {
+    display: none !important;
+}
+
+body {
+    -webkit-tap-highlight-color: transparent;
+    font-family: 'Tajawal', sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+input, textarea, select {
+    user-select: auto;
+    -webkit-user-select: auto;
+}
+
+/* Branch Badges */
+.badge-branch-tahnah {
+    background-color: #78350f !important;
+    color: #fef3c7 !important;
+    border: 1px solid #451a03 !important;
+    font-weight: 700;
+}
+
+.badge-branch-katheeb {
+    background-color: #fef3c7 !important;
+    color: #92400e !important;
+    border: 1px solid #fcd34d !important;
+    font-weight: 700;
+}
+
+.badge-branch-zafal {
+    background-color: #dcfce7 !important;
+    color: #166534 !important;
+    border: 1px solid #86efac !important;
+    font-weight: 700;
+}
+
+/* Animations */
+.tab-pane {
+    display: none;
+    animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tab-pane:not(.hidden) {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Low Stock Alert Pulse */
+@keyframes alertPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.85; transform: scale(1.03); }
+}
+
+.pulse-alert {
+    animation: alertPulse 2s infinite ease-in-out;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Modals */
+.modal-overlay {
+    background-color: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(5px);
+}
+
+/* Action Cards */
+.action-card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+/* Status Badges */
+.badge-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.65rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* ================= MOBILE-FIRST DEDICATED UX ================= */
+@media (max-width: 768px) {
+    body {
+        padding-bottom: calc(75px + env(safe-area-inset-bottom, 10px));
+    }
+    
+    .mobile-tab-scroll {
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    input, select, button {
+        font-size: 14px !important;
+    }
+
+    /* Modal Full Height on Small Screens */
+    .modal-overlay > div {
+        max-height: 94vh !important;
+        border-radius: 1.5rem !important;
+    }
+}
+
+/* Bottom Navigation Bar for Mobile */
+#mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(65px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(226, 232, 240, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 45;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+}
+
+@media (min-width: 769px) {
+    #mobile-bottom-nav {
+        display: none !important;
+    }
+}
+
+.mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    height: 100%;
+    color: #64748b;
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+
+.mobile-nav-item.active {
+    color: #4f46e5;
+}
+
+.mobile-nav-item.active .nav-icon-box {
+    background-color: #eef2ff;
+    transform: translateY(-2px);
+}
+
+.mobile-nav-item:active {
+    transform: scale(0.92);
+}
+
+.nav-icon-box {
+    width: 36px;
+    height: 32px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.2s ease;
+}
+
+/* Mobile Slide-Up Drawer */
+#mobile-drawer {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+#mobile-drawer.drawer-closed {
+    transform: translateY(100%);
+    pointer-events: none;
+    opacity: 0;
+}
+
+#mobile-drawer.drawer-open {
+    transform: translateY(0);
+    pointer-events: auto;
+    opacity: 1;
+}
+
+/* Touch Pull Indicator */
+.drawer-handle {
+    width: 40px;
+    height: 5px;
+    background-color: #cbd5e1;
+    border-radius: 9999px;
+    margin: 0 auto 12px auto;
+}
