@@ -143,24 +143,71 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    const tabTitlesMap = {
+        'dashboard-tab': '📊 لوحة القيادة (لوحة التحكم)',
+        'usage-tab': '⚡ نقاط البيع (الكاشير والاستهلاك)',
+        'purchases-tab': '🛒 المشتريات المحلية',
+        'external-purchases-tab': '🚚 المشتريات الخارجية والطلبيات',
+        'orders-tab': '👨‍🍳 تقديم طلب (المطبخ والإنتاج)',
+        'products-tab': '📦 دليل وإدارة المنتجات',
+        'warehouse-1-tab': '🏬 مخزن المشتريات المحلية',
+        'warehouse-2-tab': '🏢 مخزن المشتريات الخارجية',
+        'shelves-tab': '🏪 إدارة مخزن الأرفف وتزويد المحلات',
+        'recipes-tab': '📖 دليل الوصفات والإنتاج',
+        'archive-tab': '🗄️ أرشيف المنتجات والمواد المتوقفة',
+        'product-report-tab': '📊 تقرير حركة وتتبع المنتج الشامل',
+        'waste-tab': '🗑️ تسجيل التالف والهدر',
+        'stocktake-tab': '📋 الجرد الشهري والفعلي',
+        'profits-tab': '💰 الأرباح والتقارير المالية',
+        'staff-tasks-tab': '👥 إدارة الموظفين والصلاحيات'
+    };
+
     window.switchTab = function(targetTabId) {
         if (!targetTabId) return;
         const tabBtns = document.querySelectorAll('.tab-btn');
         const tabPanes = document.querySelectorAll('.tab-pane');
         const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
 
-        // Update Desktop Tabs
+        // Update Sidebar and Desktop Nav Buttons
         tabBtns.forEach(b => {
             if (b.getAttribute('data-tab-id') === targetTabId) {
-                b.classList.add('bg-indigo-600', 'text-white');
-                b.classList.remove('text-slate-600');
+                b.classList.add('bg-indigo-600', 'text-white', 'shadow-xs');
+                b.classList.remove('text-slate-600', 'md:text-slate-300', 'md:text-slate-400', 'hover:bg-slate-100', 'md:hover:bg-slate-800');
             } else {
-                b.classList.remove('bg-indigo-600', 'text-white');
-                b.classList.add('text-slate-600');
+                b.classList.remove('bg-indigo-600', 'text-white', 'shadow-xs');
+                b.classList.add('text-slate-600', 'md:text-slate-300', 'hover:bg-slate-100', 'md:hover:bg-slate-800');
             }
         });
 
-        // Close inventory dropdown menu when switching any tab
+        // Auto-expand parent accordion if inside purchases or warehouses
+        if (targetTabId === 'purchases-tab' || targetTabId === 'external-purchases-tab') {
+            const purContent = document.getElementById('pur-accordion-content');
+            const purChevron = document.getElementById('pur-accordion-chevron');
+            if (purContent) purContent.classList.remove('hidden');
+            if (purChevron) purChevron.style.transform = 'rotate(180deg)';
+        } else if (targetTabId === 'warehouse-1-tab' || targetTabId === 'warehouse-2-tab' || targetTabId === 'shelves-tab') {
+            const whContent = document.getElementById('wh-accordion-content');
+            const whChevron = document.getElementById('wh-accordion-chevron');
+            if (whContent) whContent.classList.remove('hidden');
+            if (whChevron) whChevron.style.transform = 'rotate(180deg)';
+        }
+
+        // Update Top Workspace Page Title
+        const pageTitleEl = document.getElementById('workspace-page-title');
+        if (pageTitleEl && tabTitlesMap[targetTabId]) {
+            pageTitleEl.innerHTML = tabTitlesMap[targetTabId];
+        }
+
+        // On mobile: auto close sidebar menu on navigation
+        if (window.innerWidth < 768) {
+            const sidebar = document.getElementById('app-sidebar');
+            const navContainer = document.getElementById('sidebar-nav-container');
+            if (sidebar && navContainer && navContainer.classList.contains('mobile-open')) {
+                toggleSidebarMenu();
+            }
+        }
+
+        // Close dropdown menus when switching any tab
         const menu = document.getElementById('inventory-dropdown-menu');
         const chevron = document.getElementById('inventory-dropdown-chevron');
         if (menu) {
@@ -168,6 +215,27 @@ document.addEventListener('DOMContentLoaded', async () => {
             menu.classList.add('hidden');
         }
         if (chevron) chevron.style.transform = 'rotate(0deg)';
+
+        const purMenu = document.getElementById('purchases-dropdown-menu');
+        const purChevron = document.getElementById('purchases-dropdown-chevron');
+        if (purMenu) {
+            purMenu.style.display = 'none';
+            purMenu.classList.add('hidden');
+        }
+        if (purChevron) purChevron.style.transform = 'rotate(0deg)';
+
+        // Highlight parent "إدارة المشتريات" dropdown button if current tab is purchases or external purchases
+        const isPurchasesSubTab = (targetTabId === 'purchases-tab' || targetTabId === 'external-purchases-tab');
+        const purDropdownBtn = document.getElementById('purchases-dropdown-btn');
+        if (purDropdownBtn) {
+            if (isPurchasesSubTab) {
+                purDropdownBtn.classList.add('bg-indigo-600', 'text-white');
+                purDropdownBtn.classList.remove('text-slate-600');
+            } else {
+                purDropdownBtn.classList.remove('bg-indigo-600', 'text-white');
+                purDropdownBtn.classList.add('text-slate-600');
+            }
+        }
 
         // Highlight parent "إدارة المخزون" dropdown button if current tab is one of the inventory sub-tabs
         const isInventorySubTab = (targetTabId === 'warehouse-1-tab' || targetTabId === 'warehouse-2-tab' || targetTabId === 'shelves-tab' || targetTabId === 'products-tab' || targetTabId === 'archive-tab' || targetTabId === 'product-report-tab');
@@ -1060,7 +1128,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // --- Dynamic Multi-Item Invoice Row Creator ---
-    function addPurchaseItemRow(itemData = null) {
+    window.addPurchaseItemRow = function addPurchaseItemRow(itemData = null) {
         const categories = Store.getCategories();
         const container = document.getElementById('purchase-items-list');
         const rowId = 'pur-row-' + Date.now() + Math.random().toString(36).substr(2, 4);
@@ -1274,6 +1342,35 @@ document.addEventListener('DOMContentLoaded', async () => {
             addPurchaseItemRow(item);
         });
 
+        // Set Invoice Date for Editing
+        const user = Store.getLoggedInUser();
+        const isAdmin = user && user.role === 'admin';
+        const dateInput = document.getElementById('pur-invoice-date');
+        const dateBadge = document.getElementById('pur-date-admin-badge');
+        const dateHint = document.getElementById('pur-date-hint');
+
+        if (dateInput) {
+            const rawDate = p.dateAdded || new Date().toISOString();
+            dateInput.value = rawDate.split('T')[0];
+            if (isAdmin) {
+                dateInput.disabled = false;
+                dateInput.removeAttribute('readonly');
+                if (dateBadge) {
+                    dateBadge.textContent = '👑 صلاحية المسؤول: تعديل تاريخ الفاتورة';
+                    dateBadge.className = 'badge-pill bg-emerald-100 text-emerald-800 text-[10px] font-bold';
+                }
+                if (dateHint) dateHint.textContent = 'يمكنك تغيير وتعديل تاريخ الفاتورة ليتم تصنيفها وحسابها في يومها المحدد';
+            } else {
+                dateInput.disabled = true;
+                dateInput.setAttribute('readonly', 'true');
+                if (dateBadge) {
+                    dateBadge.textContent = '🔒 مقفل (صلاحية تعديل التاريخ للمسؤول فقط)';
+                    dateBadge.className = 'badge-pill bg-slate-200 text-slate-700 text-[10px] font-bold';
+                }
+                if (dateHint) dateHint.textContent = 'تعديل تاريخ الفواتير يتطلب حساب المسؤول العام';
+            }
+        }
+
         updateInvoiceAutoSummary();
         openModal('add-purchase-modal');
     };
@@ -1377,14 +1474,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             approvedBy: existing ? existing.approvedBy : undefined,
             loggedBy: existing ? existing.loggedBy : (user ? `${user.name} (${getI18nText('role_' + user.role) || user.role})` : 'أحمد بن سعيد (المدير العام)'),
             items: items,
-            dateAdded: existing ? existing.dateAdded : new Date().toISOString()
+            dateAdded: (() => {
+                const chosenDate = document.getElementById('pur-invoice-date')?.value;
+                if (chosenDate) {
+                    const todayStr = new Date().toISOString().split('T')[0];
+                    if (chosenDate === todayStr && !existing) {
+                        return new Date().toISOString();
+                    }
+                    return new Date(chosenDate + 'T12:00:00.000Z').toISOString();
+                }
+                return existing ? existing.dateAdded : new Date().toISOString();
+            })()
         });
 
         // Reset form & list
         document.getElementById('purchase-items-list').innerHTML = '';
         document.getElementById('pur-edit-id').value = '';
         document.getElementById('pur-invoice-base64').value = '';
-        document.getElementById('pur-modal-title').textContent = 'تسجيل فاتورة مشتريات جديدة (بالريال العماني ر.ع)';
+        document.getElementById('pur-modal-title').textContent = 'تسجيل فاتورة مشتريات محلية جديدة (بالريال العماني ر.ع)';
         document.getElementById('pur-image-preview-box')?.classList.add('hidden');
         document.getElementById('purchase-form').reset();
         updateInvoiceAutoSummary();
@@ -1464,6 +1571,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             invBase64.value = '';
             previewBox.classList.add('hidden');
+        }
+
+        // Set Invoice Date for Editing
+        const user = Store.getLoggedInUser();
+        const isAdmin = user && user.role === 'admin';
+        const dateInput = document.getElementById('cons-invoice-date');
+        const dateBadge = document.getElementById('cons-date-admin-badge');
+        const dateHint = document.getElementById('cons-date-hint');
+
+        if (dateInput) {
+            const rawDate = p.dateAdded || new Date().toISOString();
+            dateInput.value = rawDate.split('T')[0];
+            if (isAdmin) {
+                dateInput.disabled = false;
+                dateInput.removeAttribute('readonly');
+                if (dateBadge) {
+                    dateBadge.textContent = '👑 صلاحية المسؤول: تعديل تاريخ الفاتورة';
+                    dateBadge.className = 'badge-pill bg-emerald-100 text-emerald-800 text-[10px] font-bold';
+                }
+                if (dateHint) dateHint.textContent = 'يمكنك تغيير وتعديل تاريخ الفاتورة الاستهلاكية';
+            } else {
+                dateInput.disabled = true;
+                dateInput.setAttribute('readonly', 'true');
+                if (dateBadge) {
+                    dateBadge.textContent = '🔒 مقفل (صلاحية تعديل التاريخ للمسؤول فقط)';
+                    dateBadge.className = 'badge-pill bg-slate-200 text-slate-700 text-[10px] font-bold';
+                }
+                if (dateHint) dateHint.textContent = 'تعديل تاريخ الفواتير يتطلب حساب المسؤول العام';
+            }
         }
 
         openModal('add-consumable-purchase-modal');
@@ -1549,7 +1685,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             isApproved: existing ? existing.isApproved : false,
             approvedBy: existing ? existing.approvedBy : undefined,
             loggedBy: existing ? existing.loggedBy : (user ? `${user.name} (${getI18nText('role_' + user.role) || user.role})` : 'أحمد بن سعيد (المدير العام)'),
-            dateAdded: existing ? existing.dateAdded : new Date().toISOString()
+            dateAdded: (() => {
+                const chosenDate = document.getElementById('cons-invoice-date')?.value;
+                if (chosenDate) {
+                    const todayStr = new Date().toISOString().split('T')[0];
+                    if (chosenDate === todayStr && !existing) {
+                        return new Date().toISOString();
+                    }
+                    return new Date(chosenDate + 'T12:00:00.000Z').toISOString();
+                }
+                return existing ? existing.dateAdded : new Date().toISOString();
+            })()
         });
 
         // Reset
@@ -2137,63 +2283,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // ================= 6. UNIFIED PRODUCTS & RAW MATERIALS MANAGEMENT =================
-    window.activeProductTypeTab = 'all'; // 'all' | 'raw' | 'pkg'
-
-    window.setProductTypeTab = function(type) {
-        window.activeProductTypeTab = type;
-        const btnAll = document.getElementById('btn-type-all');
-        const btnRaw = document.getElementById('btn-type-raw');
-        const btnPkg = document.getElementById('btn-type-pkg');
-
-        [btnAll, btnRaw, btnPkg].forEach(b => {
-            if (b) {
-                b.className = 'px-3.5 py-1.5 rounded-xl font-bold text-xs bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
-            }
-        });
-
-        if (type === 'all' && btnAll) btnAll.className = 'px-3.5 py-1.5 rounded-xl font-bold text-xs bg-indigo-600 text-white shadow-xs transition';
-        if (type === 'raw' && btnRaw) btnRaw.className = 'px-3.5 py-1.5 rounded-xl font-bold text-xs bg-emerald-600 text-white shadow-xs transition';
-        if (type === 'pkg' && btnPkg) btnPkg.className = 'px-3.5 py-1.5 rounded-xl font-bold text-xs bg-purple-600 text-white shadow-xs transition';
-
-        renderProductsTab();
-    };
-
-    window.switchProductNatureType = function(type) {
-        const entityField = document.getElementById('prod-entity-type');
-        if (entityField) entityField.value = type;
-
-        const rawFields = document.getElementById('raw-specific-fields');
-        const pkgFields = document.getElementById('pkg-specific-fields');
-        const lblRaw = document.getElementById('lbl-type-raw');
-        const lblPkg = document.getElementById('lbl-type-pkg');
-        const nameInput = document.getElementById('prod-name');
-        const nameLabel = document.getElementById('prod-name-label');
-
-        if (type === 'raw') {
-            if (rawFields) rawFields.classList.remove('hidden');
-            if (pkgFields) pkgFields.classList.add('hidden');
-            if (lblRaw) lblRaw.className = 'flex items-center gap-2.5 p-3 border-2 border-indigo-600 rounded-2xl bg-indigo-50/70 cursor-pointer transition';
-            if (lblPkg) lblPkg.className = 'flex items-center gap-2.5 p-3 border-2 border-slate-200 rounded-2xl bg-slate-50 cursor-pointer transition';
-            if (nameLabel) nameLabel.textContent = 'اسم المادة / المنتج الخام *';
-            if (nameInput) nameInput.placeholder = 'مثال: طحين رقم 1، سكر أبيض، زيت زيتون...';
-            const rRadio = document.querySelector('input[name="prod_nature_radio"][value="raw"]');
-            if (rRadio) rRadio.checked = true;
-        } else {
-            if (rawFields) rawFields.classList.add('hidden');
-            if (pkgFields) pkgFields.classList.remove('hidden');
-            if (lblRaw) lblRaw.className = 'flex items-center gap-2.5 p-3 border-2 border-slate-200 rounded-2xl bg-slate-50 cursor-pointer transition';
-            if (lblPkg) lblPkg.className = 'flex items-center gap-2.5 p-3 border-2 border-purple-600 rounded-2xl bg-purple-50/70 cursor-pointer transition';
-            if (nameLabel) nameLabel.textContent = 'اسم منتج / مستلزم التغليف *';
-            if (nameInput) nameInput.placeholder = 'مثال: علب برجر كرتون، أكياس ورقية، أكواب عصير...';
-            const pRadio = document.querySelector('input[name="prod_nature_radio"][value="pkg"]');
-            if (pRadio) pRadio.checked = true;
-        }
-    };
-
+    // ================= 6. UNIFIED PRODUCTS MANAGEMENT (دليل وإدارة المنتجات) =================
     function getProductLocationName(loc) {
         if (!loc) return 'غير محدد';
-        if (loc === 'wh1' || loc === 'wh-1' || loc === 'wh1_fixed_id') return '🏢 مخزن المشتريات المحلية';
+        if (loc === 'wh1' || loc === 'wh-1' || loc === 'wh1_fixed_id') return '🏬 مخزن المشتريات المحلية';
         if (loc === 'wh2' || loc === 'wh-2' || loc === 'wh2_fixed_id') return '🏢 مخزن المشتريات الخارجية';
         if (loc === 'tahnah') return '🏪 فرع طحنه';
         if (loc === 'katheeb') return '🏪 فرع كثيب';
@@ -2205,136 +2298,84 @@ document.addEventListener('DOMContentLoaded', async () => {
         const tbody = document.getElementById('products-table-body');
         if (!tbody) return;
 
-        const rawIngredients = Store.getIngredients().filter(i => !i.archived);
-        const pkgProducts = Store.getProducts().filter(p => !p.archived);
+        const allIngredients = Store.getIngredients().filter(i => !i.archived);
         const categories = Store.getCategories();
         const warehouses = Store.getWarehouses();
 
-        // Update Location Filter Dropdown
-        const locFilter = document.getElementById('prod-filter-location');
-        if (locFilter && locFilter.children.length <= 1) {
-            locFilter.innerHTML = `
-                <option value="all">جميع المواقع والمخازن</option>
-                ${warehouses.map(w => `<option value="${w.id}">🏢 ${w.name}</option>`).join('')}
-                <option value="tahnah">🏪 فرع طحنه</option>
-                <option value="katheeb">🏪 فرع كثيب</option>
-                <option value="zafal">🏪 فرع زعفل</option>
-            `;
-        }
-
         // Update Category Filter Dropdown
         const catFilter = document.getElementById('prod-filter-category');
-        if (catFilter && catFilter.children.length <= 1) {
+        const selectedWhFilter = document.getElementById('prod-filter-warehouse')?.value || 'all';
+
+        if (catFilter) {
+            let availableCats = categories;
+            if (selectedWhFilter !== 'all') {
+                const whObj = warehouses.find(w => w.id === selectedWhFilter);
+                if (whObj && whObj.categoryIds) {
+                    availableCats = categories.filter(c => whObj.categoryIds.includes(c.id));
+                }
+            }
+            const currentSelectedCat = catFilter.value || 'all';
             catFilter.innerHTML = `
-                <option value="all">جميع الفئات والتصنيفات</option>
-                <optgroup label="🌾 فئات المواد الخام">
-                    ${categories.map(c => `<option value="raw_${c.id}">${c.name}</option>`).join('')}
-                </optgroup>
-                <optgroup label="📦 فئات مستلزمات التغليف">
-                    <option value="pkg_علب وبوكسات">علب وبوكسات</option>
-                    <option value="pkg_أكياس وتغليف">أكياس وتغليف</option>
-                    <option value="pkg_أكواب وأغطية">أكواب وأغطية</option>
-                    <option value="pkg_استيكرات ومطبوعات">استيكرات ومطبوعات</option>
-                    <option value="pkg_أدوات وملاعق">أدوات وملاعق</option>
-                    <option value="pkg_مستلزمات عامة">مستلزمات عامة</option>
-                    <option value="pkg_أخرى">أخرى</option>
-                </optgroup>
+                <option value="all">🏷️ جميع الفئات (${availableCats.length})</option>
+                ${availableCats.map(c => `<option value="${c.id}" ${currentSelectedCat === c.id ? 'selected' : ''}>${c.name}</option>`).join('')}
             `;
         }
 
-        // Update Modal Dropdowns for Raw Material
-        const rawCatSelect = document.getElementById('prod-raw-category-select');
-        if (rawCatSelect && rawCatSelect.children.length === 0) {
-            rawCatSelect.innerHTML = categories.map(c => `<option value="${c.id}" data-wh="${c.warehouseId || 'wh1'}">${c.name}</option>`).join('');
-        }
+        // Update Modal Dropdown for Warehouse
         const rawWhSelect = document.getElementById('prod-raw-warehouse-select');
         if (rawWhSelect && rawWhSelect.children.length === 0) {
             rawWhSelect.innerHTML = warehouses.map(w => `<option value="${w.id}">${w.name}</option>`).join('');
         }
 
-        // Update Modal Dropdowns for Packaging
-        const pkgLocSelect = document.getElementById('prod-pkg-location-select');
-        if (pkgLocSelect && pkgLocSelect.children.length <= 5) {
-            pkgLocSelect.innerHTML = `
-                ${warehouses.map(w => `<option value="${w.id}">🏢 ${w.name}</option>`).join('')}
-                <option value="tahnah">🏪 فرع طحنه</option>
-                <option value="katheeb">🏪 فرع كثيب</option>
-                <option value="zafal">🏪 فرع زعفل</option>
-            `;
-        }
-
         // Update KPIs
+        const localItems = allIngredients.filter(i => i.warehouseId === 'wh1_fixed_id' || i.warehouseId === 'wh1');
+        const externalItems = allIngredients.filter(i => i.warehouseId === 'wh2_fixed_id' || i.warehouseId === 'wh2');
+        
+        let lowStockCount = 0;
+        allIngredients.forEach(ing => {
+            const stock = Store.getIngredientStock(ing.id);
+            const remaining = (stock.purchased + (stock.externalPurchased || 0)) - (stock.used + stock.wasted);
+            if (remaining <= (ing.minThreshold || 0)) lowStockCount++;
+        });
+
         const totalCountEl = document.getElementById('stat-products-total');
-        const rawCountEl = document.getElementById('stat-products-raw');
-        const pkgCountEl = document.getElementById('stat-products-pkg');
+        const localCountEl = document.getElementById('stat-products-local');
+        const externalCountEl = document.getElementById('stat-products-external');
         const lowCountEl = document.getElementById('stat-products-low');
 
-        if (totalCountEl) totalCountEl.textContent = rawIngredients.length + pkgProducts.length;
-        if (rawCountEl) rawCountEl.textContent = rawIngredients.length;
-        if (pkgCountEl) pkgCountEl.textContent = pkgProducts.length;
-        if (lowCountEl) lowCountEl.textContent = '0';
+        if (totalCountEl) totalCountEl.textContent = allIngredients.length;
+        if (localCountEl) localCountEl.textContent = localItems.length;
+        if (externalCountEl) externalCountEl.textContent = externalItems.length;
+        if (lowCountEl) lowCountEl.textContent = lowStockCount;
 
         // Prepare unified items list
-        let unifiedList = [];
-        rawIngredients.forEach(ing => {
+        let unifiedList = allIngredients.map(ing => {
             const cat = categories.find(c => c.id === ing.categoryId);
             const wh = warehouses.find(w => w.id === ing.warehouseId);
-            unifiedList.push({
-                entityType: 'raw',
+            return {
                 id: ing.id,
                 name: ing.name,
                 categoryName: cat ? cat.name : 'عام',
                 categoryId: ing.categoryId,
-                locationCode: ing.warehouseId || 'wh1',
-                locationName: wh ? wh.name : 'مخزن المشتريات المحلية',
+                warehouseId: ing.warehouseId || 'wh1_fixed_id',
+                warehouseName: wh ? wh.name : (ing.warehouseId === 'wh2_fixed_id' ? 'مخزن المشتريات الخارجية' : 'مخزن المشتريات المحلية'),
                 unit: getI18nText('unit_' + ing.unit) || ing.unit,
                 rawUnit: ing.unit,
+                costPrice: ing.costPrice || 0,
                 minThreshold: ing.minThreshold || 5,
-                hasExpiry: (ing.hasExpiry === 'no' || ing.hasExpiry === false) ? 'no' : 'yes',
-                notes: ''
-            });
+                hasExpiry: (ing.hasExpiry === 'no' || ing.hasExpiry === false) ? 'no' : 'yes'
+            };
         });
 
-        pkgProducts.forEach(prod => {
-            unifiedList.push({
-                entityType: 'pkg',
-                id: prod.id,
-                name: prod.name,
-                categoryName: prod.category || 'عام',
-                categoryId: prod.category,
-                locationCode: prod.location || 'wh1',
-                locationName: getProductLocationName(prod.location),
-                unit: prod.unit || 'حبة',
-                rawUnit: prod.unit,
-                minThreshold: prod.minThreshold || 20,
-                hasExpiry: 'no',
-                notes: prod.notes || ''
-            });
-        });
-
-        // Filter by Type Tab
-        if (window.activeProductTypeTab === 'raw') {
-            unifiedList = unifiedList.filter(item => item.entityType === 'raw');
-        } else if (window.activeProductTypeTab === 'pkg') {
-            unifiedList = unifiedList.filter(item => item.entityType === 'pkg');
-        }
-
-        // Filter by Location
-        const locFilterVal = document.getElementById('prod-filter-location')?.value || 'all';
-        if (locFilterVal !== 'all') {
-            unifiedList = unifiedList.filter(item => item.locationCode === locFilterVal);
+        // Filter by Warehouse
+        if (selectedWhFilter !== 'all') {
+            unifiedList = unifiedList.filter(item => item.warehouseId === selectedWhFilter || (selectedWhFilter === 'wh1_fixed_id' && item.warehouseId === 'wh1') || (selectedWhFilter === 'wh2_fixed_id' && item.warehouseId === 'wh2'));
         }
 
         // Filter by Category
         const catFilterVal = document.getElementById('prod-filter-category')?.value || 'all';
         if (catFilterVal !== 'all') {
-            if (catFilterVal.startsWith('raw_')) {
-                const targetCatId = catFilterVal.replace('raw_', '');
-                unifiedList = unifiedList.filter(item => item.entityType === 'raw' && item.categoryId === targetCatId);
-            } else if (catFilterVal.startsWith('pkg_')) {
-                const targetPkgCat = catFilterVal.replace('pkg_', '');
-                unifiedList = unifiedList.filter(item => item.entityType === 'pkg' && item.categoryName === targetPkgCat);
-            }
+            unifiedList = unifiedList.filter(item => item.categoryId === catFilterVal);
         }
 
         // Filter by Search Query
@@ -2343,8 +2384,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             unifiedList = unifiedList.filter(item => 
                 (item.name || '').toLowerCase().includes(searchVal) ||
                 (item.categoryName || '').toLowerCase().includes(searchVal) ||
-                (item.locationName || '').toLowerCase().includes(searchVal) ||
-                (item.notes || '').toLowerCase().includes(searchVal)
+                (item.warehouseName || '').toLowerCase().includes(searchVal)
             );
         }
 
@@ -2353,7 +2393,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <tr>
                     <td colspan="8" class="text-center py-10 text-slate-400 font-bold">
                         <div class="text-3xl mb-1.5">📦</div>
-                        <p class="text-sm font-bold text-slate-600">لا توجد منتجات أو مواد مطابقة للبحث أو التصفية.</p>
+                        <p class="text-sm font-bold text-slate-600">لا توجد منتجات مسجلة مطابقة للبحث أو التصفية.</p>
                         <button type="button" onclick="openAddProductModal('all')" class="mt-2.5 text-indigo-600 hover:underline font-bold text-xs cursor-pointer">
                             + إضافة منتج جديد الآن
                         </button>
@@ -2364,41 +2404,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         tbody.innerHTML = unifiedList.map(item => {
-            const isRaw = item.entityType === 'raw';
-            const typeBadge = isRaw
-                ? '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[11px] font-black bg-emerald-50 text-emerald-800 border border-emerald-200">🌾 منتج خام</span>'
-                : '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[11px] font-black bg-purple-50 text-purple-800 border border-purple-200">📦 مستلزم تغليف</span>';
+            const isLocal = (item.warehouseId === 'wh1_fixed_id' || item.warehouseId === 'wh1');
+            const whBadge = isLocal
+                ? '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[11px] font-black bg-emerald-50 text-emerald-800 border border-emerald-200">🏬 مخزن المشتريات المحلية</span>'
+                : '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[11px] font-black bg-purple-50 text-purple-800 border border-purple-200">🏢 مخزن المشتريات الخارجية</span>';
 
-            const expiryOrNotes = isRaw
-                ? (item.hasExpiry === 'yes'
-                    ? '<span class="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md">إلزامي ⏳</span>'
-                    : '<span class="text-[11px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">بدون انتهاء ♾️</span>')
-                : (item.notes
-                    ? `<span class="text-[11px] text-slate-600 font-normal truncate block max-w-xs" title="${item.notes}">${item.notes}</span>`
-                    : '<span class="text-[11px] text-slate-400">-</span>');
+            const expiryBadge = (item.hasExpiry === 'yes')
+                ? '<span class="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md">إلزامي ⏳</span>'
+                : '<span class="text-[11px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">بدون انتهاء ♾️</span>';
 
             return `
                 <tr class="hover:bg-slate-50 transition">
                     <td class="px-4 py-3 font-bold text-slate-900 text-xs sm:text-sm">
-                        <div class="flex items-center gap-1.5">
-                            <span>${isRaw ? '🌾' : '📦'}</span>
-                            <span>${item.name}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center font-bold text-xs">📦</span>
+                            <span class="font-black">${item.name}</span>
                         </div>
                     </td>
-                    <td class="px-4 py-3">${typeBadge}</td>
+                    <td class="px-4 py-3">${whBadge}</td>
                     <td class="px-4 py-3 font-medium text-slate-700 text-xs">
-                        <span class="px-2 py-0.5 bg-slate-100 rounded-md border border-slate-200">${item.categoryName}</span>
+                        <span class="px-2.5 py-1 bg-slate-100 rounded-lg border border-slate-200 font-bold">${item.categoryName}</span>
                     </td>
-                    <td class="px-4 py-3 font-bold text-indigo-900 text-xs">${item.locationName}</td>
                     <td class="px-4 py-3 font-bold text-slate-800 text-xs">${item.unit}</td>
                     <td class="px-4 py-3 font-black text-rose-700 text-xs">${item.minThreshold} ${item.unit}</td>
-                    <td class="px-4 py-3">${expiryOrNotes}</td>
+                    <td class="px-4 py-3">${expiryBadge}</td>
                     <td class="px-4 py-3 text-center">
                         <div class="flex items-center justify-center gap-1.5 flex-wrap">
-                            <button type="button" onclick="openProductMovementReport('${item.id}', '${item.entityType === 'raw' ? 'ingredient' : 'product'}')" class="px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1" title="عرض تقرير حركة وتتبع المنتج">📊 تقرير</button>
-                            <button type="button" onclick="archiveProductItem('${item.id}', '${item.entityType === 'raw' ? 'ingredient' : 'product'}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1" title="أرشفة المنتج">🗄️ أرشفة</button>
-                            <button type="button" onclick="openEditUnifiedProductModal('${item.entityType}', '${item.id}')" class="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-bold transition cursor-pointer" title="تعديل">✏️</button>
-                            <button type="button" onclick="deleteUnifiedProduct('${item.entityType}', '${item.id}')" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-bold transition cursor-pointer" title="حذف">🗑️</button>
+                            <button type="button" onclick="openProductMovementReport('${item.id}', 'ingredient')" class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1" title="عرض تقرير حركة وتتبع المنتج">📊 تقرير</button>
+                            <button type="button" onclick="archiveProductItem('${item.id}', 'ingredient')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1" title="أرشفة المنتج">🗄️ أرشفة</button>
+                            <button type="button" onclick="openEditUnifiedProductModal('${item.id}')" class="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-bold transition cursor-pointer" title="تعديل">✏️</button>
+                            <button type="button" onclick="deleteUnifiedProduct('${item.id}')" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-bold transition cursor-pointer" title="حذف">🗑️</button>
                         </div>
                     </td>
                 </tr>
@@ -2516,23 +2551,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         openModal('manage-categories-modal');
     };
 
-    window.updateRawWarehouseThresholdVisibility = function() {
-        const whSelect = document.getElementById('prod-raw-warehouse-select');
-        const singleBox = document.getElementById('raw-single-threshold-box');
-        const dualBox = document.getElementById('raw-dual-thresholds-wh2');
-        if (!whSelect || !singleBox || !dualBox) return;
-
-        if (whSelect.value === 'wh2_fixed_id') {
-            singleBox.classList.add('hidden');
-            dualBox.classList.remove('hidden');
-        } else {
-            singleBox.classList.remove('hidden');
-            dualBox.classList.add('hidden');
-        }
-    };
-
     document.getElementById('prod-raw-warehouse-select')?.addEventListener('change', (e) => {
-        if (window.updateRawWarehouseThresholdVisibility) window.updateRawWarehouseThresholdVisibility();
         if (window.updateProductModalCategories) window.updateProductModalCategories(e.target.value);
     });
 
@@ -2544,153 +2563,96 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('product-form')?.reset();
         document.getElementById('prod-id').value = '';
         document.getElementById('prod-modal-title').textContent = 'إضافة منتج جديد 📦';
-        document.getElementById('prod-submit-btn').textContent = 'حفظ المنتج 💾';
+        document.getElementById('prod-submit-btn').innerHTML = '<span>حفظ المنتج</span> <span>💾</span>';
 
         if (window.toggleInlineAddCategory) toggleInlineAddCategory(false);
-
-        const selectorBox = document.getElementById('prod-nature-selector-box');
-        if (selectorBox) selectorBox.classList.remove('hidden');
-
-        // Choose default nature
-        const natureToSet = (defaultType === 'pkg' || window.activeProductTypeTab === 'pkg') ? 'pkg' : 'raw';
-        switchProductNatureType(natureToSet);
 
         const rawWhSelect = document.getElementById('prod-raw-warehouse-select');
         if (rawWhSelect) {
-            const whIdToUse = (window.activeNavTab === 'warehouse-2-tab' || defaultType === 'wh2') ? 'wh2_fixed_id' : 'wh1_fixed_id';
+            const whIdToUse = (window.activeNavTab === 'warehouse-2-tab' || defaultType === 'wh2' || defaultType === 'wh2_fixed_id') ? 'wh2_fixed_id' : 'wh1_fixed_id';
             rawWhSelect.value = whIdToUse;
             if (window.updateProductModalCategories) window.updateProductModalCategories(whIdToUse);
-            if (window.updateRawWarehouseThresholdVisibility) window.updateRawWarehouseThresholdVisibility();
         }
 
         openModal('add-product-modal');
     };
 
-    window.openEditUnifiedProductModal = function(entityType, id) {
+    window.openEditUnifiedProductModal = function(id) {
         document.getElementById('product-form')?.reset();
         document.getElementById('prod-id').value = id;
-        document.getElementById('prod-entity-type').value = entityType;
 
         if (window.toggleInlineAddCategory) toggleInlineAddCategory(false);
 
-        const selectorBox = document.getElementById('prod-nature-selector-box');
-        if (selectorBox) selectorBox.classList.add('hidden');
+        document.getElementById('prod-modal-title').textContent = 'تعديل بيانات المنتج ✏️';
+        document.getElementById('prod-submit-btn').innerHTML = '<span>تحديث وحفظ التعديلات</span> <span>✅</span>';
 
-        document.getElementById('prod-modal-title').textContent = 'تعديل بيانات المنتج / المادة ✏️';
-        document.getElementById('prod-submit-btn').textContent = 'تحديث وحفظ التعديلات ✅';
+        const ing = Store.getIngredients().find(i => i.id === id);
+        if (!ing) return;
 
-        if (entityType === 'raw') {
-            const ing = Store.getIngredients().find(i => i.id === id);
-            if (!ing) return;
-            switchProductNatureType('raw');
-            document.getElementById('prod-name').value = ing.name || '';
-            document.getElementById('prod-raw-warehouse-select').value = ing.warehouseId || 'wh1_fixed_id';
-            if (window.updateProductModalCategories) window.updateProductModalCategories(ing.warehouseId || 'wh1_fixed_id', ing.categoryId);
-            document.getElementById('prod-raw-category-select').value = ing.categoryId || '';
-            document.getElementById('prod-raw-unit').value = ing.unit || 'kg';
-            document.getElementById('prod-raw-min-threshold').value = ing.minThreshold || 5;
-            document.getElementById('prod-raw-shelf-threshold').value = ing.minShelfThreshold || 5;
-            document.getElementById('prod-raw-wh-threshold').value = ing.minWarehouseThreshold || ing.minThreshold || 20;
-            document.getElementById('prod-raw-has-expiry').value = (ing.hasExpiry === 'no' || ing.hasExpiry === false) ? 'no' : 'yes';
-            if (window.updateRawWarehouseThresholdVisibility) window.updateRawWarehouseThresholdVisibility();
-        } else {
-            const prod = Store.getProducts().find(p => p.id === id);
-            if (!prod) return;
-            switchProductNatureType('pkg');
-            document.getElementById('prod-name').value = prod.name || '';
-            document.getElementById('prod-pkg-category-select').value = prod.category || 'علب وبوكسات';
-            document.getElementById('prod-pkg-location-select').value = prod.location || 'wh1';
-            document.getElementById('prod-pkg-unit').value = prod.unit || 'حبة';
-            document.getElementById('prod-pkg-min-threshold').value = prod.minThreshold || 20;
-            document.getElementById('prod-pkg-notes').value = prod.notes || '';
-        }
+        document.getElementById('prod-name').value = ing.name || '';
+        document.getElementById('prod-raw-warehouse-select').value = ing.warehouseId || 'wh1_fixed_id';
+        if (window.updateProductModalCategories) window.updateProductModalCategories(ing.warehouseId || 'wh1_fixed_id', ing.categoryId);
+        document.getElementById('prod-raw-category-select').value = ing.categoryId || '';
+        document.getElementById('prod-raw-unit').value = ing.unit || 'piece';
+        document.getElementById('prod-raw-min-threshold').value = ing.minThreshold || 5;
+        document.getElementById('prod-cost-price').value = ing.costPrice || 0;
+        document.getElementById('prod-raw-has-expiry').value = (ing.hasExpiry === 'no' || ing.hasExpiry === false) ? 'no' : 'yes';
 
         openModal('add-product-modal');
     };
 
-    window.deleteUnifiedProduct = function(entityType, id) {
-        if (entityType === 'raw') {
-            const isUsed = Store.getRecipes().some(r => r.ingredients.some(ri => ri.ingredientId === id));
-            if (isUsed) {
-                alert('لا يمكن حذف هذا المكون لأنه مستخدم في وصفات جاهزة.');
-                return;
-            }
-            if (confirm('هل أنت متأكد من حذف هذه المادة الخام؟')) {
-                Store.deleteIngredient(id);
-                renderAll();
-                showToast('تم حذف المادة الخام بنجاح! 🗑️');
-            }
-        } else {
-            if (confirm('هل أنت متأكد من حذف هذا المنتج / مستلزم التغليف؟')) {
-                Store.deleteProduct(id);
-                renderAll();
-                showToast('تم حذف المنتج بنجاح! 🗑️');
-            }
+    window.deleteUnifiedProduct = function(id) {
+        const isUsedInRecipe = Store.getRecipes().some(r => r.ingredients.some(ri => ri.ingredientId === id));
+        if (isUsedInRecipe) {
+            alert('لا يمكن حذف هذا المنتج لأنه مستخدم في وصفات حالية.');
+            return;
+        }
+        if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
+            Store.deleteIngredient(id);
+            renderAll();
+            showToast('تم حذف المنتج بنجاح! 🗑️');
         }
     };
 
     document.getElementById('product-form')?.addEventListener('submit', (e) => {
         e.preventDefault();
         const id = document.getElementById('prod-id').value;
-        const entityType = document.getElementById('prod-entity-type').value || 'raw';
         const name = document.getElementById('prod-name').value.trim();
+        const warehouseId = document.getElementById('prod-raw-warehouse-select').value || 'wh1_fixed_id';
+        const categoryId = document.getElementById('prod-raw-category-select').value;
+        const unit = document.getElementById('prod-raw-unit').value;
+        const minThreshold = parseFloat(document.getElementById('prod-raw-min-threshold').value) || 5;
+        const costPrice = parseFloat(document.getElementById('prod-cost-price')?.value) || 0;
+        const hasExpiry = document.getElementById('prod-raw-has-expiry').value;
 
-        if (!name) return;
-
-        if (entityType === 'raw') {
-            const categoryId = document.getElementById('prod-raw-category-select').value;
-            const warehouseId = document.getElementById('prod-raw-warehouse-select').value;
-            const unit = document.getElementById('prod-raw-unit').value;
-            const hasExpiry = document.getElementById('prod-raw-has-expiry').value;
-
-            let minThreshold = parseFloat(document.getElementById('prod-raw-min-threshold').value) || 5;
-            let minShelfThreshold = undefined;
-            let minWarehouseThreshold = undefined;
-
-            if (warehouseId === 'wh2_fixed_id') {
-                minShelfThreshold = parseFloat(document.getElementById('prod-raw-shelf-threshold').value) || 5;
-                minWarehouseThreshold = parseFloat(document.getElementById('prod-raw-wh-threshold').value) || 20;
-                minThreshold = minWarehouseThreshold;
-            }
-
-            Store.saveIngredient({
-                id: id ? id : undefined,
-                name,
-                categoryId,
-                warehouseId,
-                unit,
-                minThreshold,
-                minShelfThreshold,
-                minWarehouseThreshold,
-                hasExpiry
-            });
-            closeModal('add-product-modal');
-            renderAll();
-            showToast(`تم حفظ المادة الخام (${name}) بنجاح! 🌾✅`);
-        } else {
-            const category = document.getElementById('prod-pkg-category-select').value;
-            const location = document.getElementById('prod-pkg-location-select').value;
-            const unit = document.getElementById('prod-pkg-unit').value;
-            const minThreshold = parseFloat(document.getElementById('prod-pkg-min-threshold').value) || 20;
-            const notes = document.getElementById('prod-pkg-notes').value.trim();
-
-            Store.saveProduct({
-                id: id ? id : undefined,
-                name,
-                category,
-                location,
-                unit,
-                minThreshold,
-                notes
-            });
-            closeModal('add-product-modal');
-            renderAll();
-            showToast(`تم حفظ منتج التغليف (${name}) بنجاح! 📦✅`);
+        if (!name) {
+            alert('يرجى إدخال اسم المنتج!');
+            return;
         }
+
+        if (!categoryId) {
+            alert('يرجى اختيار فئة المنتج أو إنشاء فئة جديدة من الزر أعلاه.');
+            return;
+        }
+
+        Store.saveIngredient({
+            id: id ? id : undefined,
+            name,
+            categoryId,
+            warehouseId,
+            unit,
+            minThreshold,
+            costPrice,
+            hasExpiry
+        });
+
+        closeModal('add-product-modal');
+        renderAll();
+        showToast(`تم حفظ المنتج (${name}) بنجاح! 📦✅`);
     });
 
     document.getElementById('prod-filter-category')?.addEventListener('change', renderProductsTab);
-    document.getElementById('prod-filter-location')?.addEventListener('change', renderProductsTab);
+    document.getElementById('prod-filter-warehouse')?.addEventListener('change', renderProductsTab);
     document.getElementById('prod-search-input')?.addEventListener('input', renderProductsTab);
 
     // ================= MASTER DROPDOWN: إدارة المخزون =================
@@ -2713,6 +2675,54 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
+    window.selectPurchasesNavTab = function(tabId) {
+        const purMenu = document.getElementById('purchases-dropdown-menu');
+        const purChevron = document.getElementById('purchases-dropdown-chevron');
+        if (purMenu) {
+            purMenu.style.display = 'none';
+            purMenu.classList.add('hidden');
+        }
+        if (purChevron) purChevron.style.transform = 'rotate(0deg)';
+
+        switchTab(tabId);
+
+        if (tabId === 'purchases-tab') {
+            renderPurchasesTab();
+        } else if (tabId === 'external-purchases-tab') {
+            renderExternalPurchasesTab();
+        }
+    };
+
+    window.togglePurchasesDropdown = function(event) {
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
+        const purMenu = document.getElementById('purchases-dropdown-menu');
+        const purChevron = document.getElementById('purchases-dropdown-chevron');
+        if (!purMenu) return;
+
+        // Close other dropdown if open
+        const invMenu = document.getElementById('inventory-dropdown-menu');
+        const invChevron = document.getElementById('inventory-dropdown-chevron');
+        if (invMenu) {
+            invMenu.style.display = 'none';
+            invMenu.classList.add('hidden');
+        }
+        if (invChevron) invChevron.style.transform = 'rotate(0deg)';
+
+        const isVisible = (purMenu.style.display === 'block' || (!purMenu.classList.contains('hidden') && purMenu.style.display !== 'none'));
+        if (isVisible) {
+            purMenu.style.display = 'none';
+            purMenu.classList.add('hidden');
+            if (purChevron) purChevron.style.transform = 'rotate(0deg)';
+        } else {
+            purMenu.style.display = 'block';
+            purMenu.classList.remove('hidden');
+            if (purChevron) purChevron.style.transform = 'rotate(180deg)';
+        }
+    };
+
     window.toggleInventoryDropdown = function(event) {
         if (event) {
             event.stopPropagation();
@@ -2721,6 +2731,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const menu = document.getElementById('inventory-dropdown-menu');
         const chevron = document.getElementById('inventory-dropdown-chevron');
         if (!menu) return;
+
+        // Close purchases dropdown if open
+        const purMenu = document.getElementById('purchases-dropdown-menu');
+        const purChevron = document.getElementById('purchases-dropdown-chevron');
+        if (purMenu) {
+            purMenu.style.display = 'none';
+            purMenu.classList.add('hidden');
+        }
+        if (purChevron) purChevron.style.transform = 'rotate(0deg)';
 
         const isVisible = (menu.style.display === 'block' || (!menu.classList.contains('hidden') && menu.style.display !== 'none'));
         if (isVisible) {
@@ -2751,16 +2770,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // Close desktop dropdown on click outside
+    // Close desktop dropdowns on click outside
     document.addEventListener('click', (e) => {
-        const wrapper = document.getElementById('inventory-dropdown-wrapper');
-        const menu = document.getElementById('inventory-dropdown-menu');
-        const chevron = document.getElementById('inventory-dropdown-chevron');
-        if (menu && (menu.style.display === 'block' || !menu.classList.contains('hidden'))) {
-            if (wrapper && !wrapper.contains(e.target)) {
-                menu.style.display = 'none';
-                menu.classList.add('hidden');
-                if (chevron) chevron.style.transform = 'rotate(0deg)';
+        const invWrapper = document.getElementById('inventory-dropdown-wrapper');
+        const invMenu = document.getElementById('inventory-dropdown-menu');
+        const invChevron = document.getElementById('inventory-dropdown-chevron');
+        if (invMenu && (invMenu.style.display === 'block' || !invMenu.classList.contains('hidden'))) {
+            if (invWrapper && !invWrapper.contains(e.target)) {
+                invMenu.style.display = 'none';
+                invMenu.classList.add('hidden');
+                if (invChevron) invChevron.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        const purWrapper = document.getElementById('purchases-dropdown-wrapper');
+        const purMenu = document.getElementById('purchases-dropdown-menu');
+        const purChevron = document.getElementById('purchases-dropdown-chevron');
+        if (purMenu && (purMenu.style.display === 'block' || !purMenu.classList.contains('hidden'))) {
+            if (purWrapper && !purWrapper.contains(e.target)) {
+                purMenu.style.display = 'none';
+                purMenu.classList.add('hidden');
+                if (purChevron) purChevron.style.transform = 'rotate(0deg)';
             }
         }
     });
@@ -4075,8 +4105,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
     }
 
-    // ================= PRODUCT MOVEMENT & LIFECYCLE REPORT TAB (تقرير حركة وتتبع المنتج الشامل) =================
-    window.activeReportItemId = null;
+        // ================= PRODUCT MOVEMENT & LIFECYCLE REPORT TAB (تقرير حركة وتتبع المنتج الشامل) =================
+    window.activeReportWarehouse = window.activeReportWarehouse || 'wh1_fixed_id';
+    window.activeReportCategory = window.activeReportCategory || 'all';
+    window.activeReportItemId = window.activeReportItemId || null;
     window.activeReportItemType = 'ingredient';
     window.activeReportDatePreset = 'all'; // 'today' | 'week' | 'month' | 'this_month' | 'last_month' | 'all' | 'custom'
     window.activeReportFromDate = '';
@@ -4085,11 +4117,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.openProductMovementReport = function(id, type = 'ingredient') {
         window.activeReportItemId = id;
         window.activeReportItemType = type;
+        
+        // Auto sync warehouse and category for this item
+        const ing = Store.getIngredients().find(i => i.id === id);
+        if (ing) {
+            if (ing.warehouseId) window.activeReportWarehouse = ing.warehouseId;
+            if (ing.categoryId) window.activeReportCategory = ing.categoryId;
+        }
+
         if (typeof window.selectInventoryNavTab === 'function') {
             window.selectInventoryNavTab('product-report-tab');
         } else {
             window.switchTab('product-report-tab');
         }
+        renderProductReportTab();
+    };
+
+    window.setProductReportWarehouse = function(whId) {
+        window.activeReportWarehouse = whId;
+        window.activeReportCategory = 'all';
+        window.activeReportItemId = null;
+        renderProductReportTab();
+    };
+
+    window.setProductReportCategory = function(catId) {
+        window.activeReportCategory = catId;
+        window.activeReportItemId = null;
+        renderProductReportTab();
+    };
+
+    window.setProductReportItem = function(id) {
+        window.activeReportItemId = id;
         renderProductReportTab();
     };
 
@@ -4122,11 +4180,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.activeReportFromDate = '';
             window.activeReportToDate = '';
         }
-        renderProductReportTab();
-    };
-
-    window.setProductReportItem = function(id) {
-        window.activeReportItemId = id;
         renderProductReportTab();
     };
 
@@ -4175,19 +4228,61 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // Set default item if none active
-        if (!window.activeReportItemId) {
-            const firstIng = allIngredients.find(i => !i.archived) || allIngredients[0];
-            if (firstIng) window.activeReportItemId = firstIng.id;
+        // 1. Warehouse Filter Level
+        const curWh = window.activeReportWarehouse || 'wh1_fixed_id';
+        let whIngredients = allIngredients.filter(i => !i.archived);
+        if (curWh === 'wh1_fixed_id' || curWh === 'wh1') {
+            whIngredients = whIngredients.filter(i => (!i.warehouseId || i.warehouseId === 'wh1_fixed_id' || i.warehouseId === 'wh1'));
+        } else if (curWh === 'wh2_fixed_id' || curWh === 'wh2') {
+            whIngredients = whIngredients.filter(i => (i.warehouseId === 'wh2_fixed_id' || i.warehouseId === 'wh2'));
         }
 
-        const selectedId = window.activeReportItemId;
-        const currentIng = allIngredients.find(i => i.id === selectedId);
-        const currentProd = allProducts.find(p => p.id === selectedId);
-        const item = currentIng || currentProd || allIngredients[0] || { name: 'المادة', unit: 'حبة' };
-        const isIng = !!currentIng;
+        // Available categories in selected warehouse
+        const targetWh = warehouses.find(w => w.id === curWh);
+        const availableCategories = categories.filter(c => 
+            whIngredients.some(i => i.categoryId === c.id) || 
+            (targetWh && targetWh.categoryIds && targetWh.categoryIds.includes(c.id))
+        );
 
-        const unitName = (typeof getI18nText === 'function' ? getI18nText('unit_' + item.unit) : item.unit) || item.unit || 'حبة';
+        // 2. Category Filter Level
+        const curCat = window.activeReportCategory || 'all';
+        let categoryFilteredItems = whIngredients;
+        if (curCat !== 'all') {
+            categoryFilteredItems = whIngredients.filter(i => i.categoryId === curCat);
+        }
+
+        // Fallback if category has no items
+        if (categoryFilteredItems.length === 0 && whIngredients.length > 0) {
+            categoryFilteredItems = whIngredients;
+        }
+
+        // 3. Active Item Resolution
+        let item = null;
+        if (window.activeReportItemId) {
+            item = allIngredients.find(i => i.id === window.activeReportItemId) || allProducts.find(p => p.id === window.activeReportItemId);
+        }
+        if (!item || (categoryFilteredItems.length > 0 && !categoryFilteredItems.some(i => i.id === item.id))) {
+            item = categoryFilteredItems[0] || whIngredients[0] || allIngredients[0];
+            if (item) window.activeReportItemId = item.id;
+        }
+
+        if (!item) {
+            item = { name: 'المادة', unit: 'حبة' };
+        }
+
+        // Clean Unit Name Helper (strips unit_ prefixes)
+        const formatCleanUnit = (u) => {
+            if (!u) return 'حبة';
+            let str = String(u);
+            if (str.startsWith('unit_')) str = str.replace('unit_', '');
+            if (typeof getI18nText === 'function') {
+                const tr = getI18nText('unit_' + str);
+                if (tr && !tr.startsWith('unit_')) return tr;
+            }
+            return str;
+        };
+
+        const unitName = formatCleanUnit(item.unit);
         const currentRemaining = parseFloat(inventory[item.id]?.remaining || 0);
 
         // Date Window Checking Function
@@ -4217,19 +4312,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 p.items.forEach(pi => {
                     if (pi.ingredientId === item.id || pi.productId === item.id) {
                         const q = parseFloat(pi.quantity) || 0;
-                        const c = parseFloat(pi.totalCost || (q * (pi.costPerUnit || 0))) || 0;
+                        const c = parseFloat(pi.totalCost || (q * (pi.costPerUnit || pi.unitCost || 0))) || 0;
                         totalPurchasedQty += q;
                         totalPurchasedCost += c;
                         relevantPurchases.push({
                             id: p.id,
                             date: pDate,
                             supplier: p.supplier || 'مورد محلي',
-                            invoiceNumber: p.invoiceNumber || '-',
+                            invoiceNumber: p.invoiceNumber || p.invoiceNo || '-',
                             quantity: q,
-                            unitPrice: parseFloat(pi.costPerUnit || (q > 0 ? c / q : 0)).toFixed(3),
+                            unitPrice: parseFloat(pi.costPerUnit || pi.unitCost || (q > 0 ? c / q : 0)).toFixed(3),
                             totalCost: c.toFixed(3),
                             expiryDate: pi.expiryDate || '-',
-                            buyer: p.recordedBy || 'المسؤول'
+                            buyer: p.loggedBy || p.recordedBy || 'المسؤول'
                         });
                     }
                 });
@@ -4244,7 +4339,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const matchingIng = (rec.ingredients || []).find(ri => ri.ingredientId === item.id);
             if (matchingIng) {
                 const qtyPerPortion = parseFloat(matchingIng.quantity) || 0;
-                // Count usage orders in date range
                 const recUsages = usageLogs.filter(u => u.recipeId === rec.id && isWithinRange(u.date || u.createdAt));
                 const totalPortions = recUsages.reduce((acc, u) => acc + (parseFloat(u.quantity) || 0), 0);
                 const consumedQty = totalPortions * qtyPerPortion;
@@ -4256,7 +4350,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     qtyPerPortion,
                     totalPortions,
                     consumedQty,
-                    unit: matchingIng.unit || unitName
+                    unit: formatCleanUnit(matchingIng.unit || unitName)
                 });
             }
         });
@@ -4310,97 +4404,131 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Preset active styles helper
         const curPreset = window.activeReportDatePreset || 'all';
         const presetBtnClass = (p) => curPreset === p
-            ? 'px-3.5 py-1.5 rounded-xl font-black bg-blue-600 text-white shadow-2xs text-xs whitespace-nowrap cursor-pointer transition'
-            : 'px-3.5 py-1.5 rounded-xl font-bold bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 text-xs whitespace-nowrap cursor-pointer transition';
+            ? 'px-3 py-1 rounded-xl font-black bg-blue-600 text-white shadow-2xs text-xs whitespace-nowrap cursor-pointer transition'
+            : 'px-3 py-1 rounded-xl font-bold bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 text-xs whitespace-nowrap cursor-pointer transition';
+
+        const itemCat = categories.find(c => c.id === item.categoryId);
+        const itemWhName = (item.warehouseId === 'wh2_fixed_id' || item.warehouseId === 'wh2') ? '🏢 مخزن المشتريات الخارجية' : '🏬 مخزن المشتريات المحلية';
 
         container.innerHTML = `
             <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-xs border border-slate-200 hover:shadow-md transition space-y-6">
-                <!-- 1. Header & Controls -->
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-5 border-b border-slate-100">
+                
+                <!-- 1. Header with Title & Print -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-slate-100">
                     <div class="flex items-center gap-3.5">
-                        <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-center text-3xl shadow-2xs">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-center text-2xl shadow-2xs">
                             📊
                         </div>
                         <div>
-                            <div class="flex items-center gap-2.5">
-                                <h3 class="text-xl sm:text-2xl font-black text-slate-900">تقرير تتبع وحركة المنتج الشامل</h3>
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-900 border border-blue-200">
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-lg sm:text-xl font-black text-slate-900">تقرير تتبع وحركة المنتج الشامل</h3>
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-900 border border-blue-200">
                                     🔎 مسار المادة الكامل
                                 </span>
                             </div>
-                            <p class="text-xs text-slate-500 mt-1">
-                                معرفة متى اشتريت المادة، أين ذهبت، كم استهلكت كل وصفة منها، التلفيات المسجلة، وحركات تزويد الأرفف خلال أي فترة زمنية تختارها.
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                تتبع حركة المادة من الشراء، استهلاك الوصفات، التلفيات، وعمليات التزويد خلال أي فترة زمنية.
                             </p>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-2 w-full md:w-auto">
-                        <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold px-4 py-2.5 rounded-xl shadow-xs text-xs sm:text-sm transition flex items-center gap-1.5 cursor-pointer">
+                        <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold px-4 py-2 rounded-xl shadow-xs text-xs transition flex items-center gap-1.5 cursor-pointer">
                             <span>🖨️</span> <span>طباعة التقرير</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- 2. Product Selector & Filter Controls -->
-                <div class="bg-slate-50/80 p-4 rounded-2xl border border-slate-200 space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Product Selection Dropdown -->
+                <!-- 2. Hierarchical Product Selection Bar (المخزن ⬅️ الفئة ⬅️ المنتج) -->
+                <div class="bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-slate-50 p-4 rounded-2xl border border-blue-200 shadow-2xs space-y-3.5">
+                    
+                    <div class="flex items-center justify-between pb-2 border-b border-blue-100/80">
+                        <span class="text-xs font-black text-blue-950 flex items-center gap-1.5">
+                            <span>🎯</span> <span>تحديد المنتج المراد تتبعه (1. المخزن ⬅️ 2. الفئة ⬅️ 3. المنتج):</span>
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <span class="badge-pill bg-blue-100 text-blue-900 text-[11px] font-bold">
+                                المنتج الحالي: ${item.name} (${itemWhName})
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        
+                        <!-- Step 1: Warehouse Selector -->
                         <div>
-                            <label class="block font-black text-slate-900 text-xs sm:text-sm mb-1.5">📦 اختيار المنتج / المادة الخام للتحليل والتتبع:</label>
-                            <select onchange="setProductReportItem(this.value)" class="w-full bg-white border-2 border-blue-300 rounded-xl p-2.5 font-bold text-slate-900 text-xs sm:text-sm focus:border-blue-600 transition shadow-2xs">
-                                <optgroup label="🏬 مواد مخزن المشتريات المحلية (الرئيسي)">
-                                    ${allIngredients.filter(i => (!i.warehouseId || i.warehouseId === 'wh1_fixed_id' || i.warehouseId === 'wh1')).map(i => `
-                                        <option value="${i.id}" ${i.id === item.id ? 'selected' : ''}>🌾 ${i.name} ${i.archived ? '(مؤرشف 🗄️)' : ''}</option>
-                                    `).join('')}
-                                </optgroup>
-                                <optgroup label="🏢 مواد مخزن المشتريات الخارجية (الفرعي)">
-                                    ${allIngredients.filter(i => (i.warehouseId === 'wh2_fixed_id' || i.warehouseId === 'wh2')).map(i => `
-                                        <option value="${i.id}" ${i.id === item.id ? 'selected' : ''}>🏢 ${i.name} ${i.archived ? '(مؤرشف 🗄️)' : ''}</option>
-                                    `).join('')}
-                                </optgroup>
-                                <optgroup label="📦 منتجات وتغليف">
-                                    ${allProducts.map(p => `
-                                        <option value="${p.id}" ${p.id === item.id ? 'selected' : ''}>📦 ${p.name} ${p.archived ? '(مؤرشف 🗄️)' : ''}</option>
-                                    `).join('')}
-                                </optgroup>
+                            <label class="block font-black text-slate-800 text-xs mb-1 flex items-center gap-1">
+                                <span class="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[9px] font-bold">1</span>
+                                <span>المخزن التابع له:</span>
+                            </label>
+                            <select onchange="setProductReportWarehouse(this.value)" class="w-full bg-white border border-slate-300 rounded-xl p-2.5 font-bold text-xs sm:text-sm text-slate-900 focus:outline-blue-500 shadow-2xs cursor-pointer">
+                                <option value="wh1_fixed_id" ${curWh === 'wh1_fixed_id' ? 'selected' : ''}>🏬 مخزن المشتريات المحلية</option>
+                                <option value="wh2_fixed_id" ${curWh === 'wh2_fixed_id' ? 'selected' : ''}>🏢 مخزن المشتريات الخارجية</option>
+                                <option value="all" ${curWh === 'all' ? 'selected' : ''}>🌟 جميع المخازن</option>
                             </select>
                         </div>
 
-                        <!-- Date Presets & Custom Range -->
+                        <!-- Step 2: Category Selector -->
                         <div>
-                            <label class="block font-black text-slate-900 text-xs sm:text-sm mb-1.5">📅 تحديد الفترة الزمنية للتقرير:</label>
-                            <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
-                                <button onclick="setProductReportDatePreset('all')" class="${presetBtnClass('all')}">كافة الفترات</button>
-                                <button onclick="setProductReportDatePreset('today')" class="${presetBtnClass('today')}">اليوم</button>
-                                <button onclick="setProductReportDatePreset('week')" class="${presetBtnClass('week')}">آخر 7 أيام</button>
-                                <button onclick="setProductReportDatePreset('month')" class="${presetBtnClass('month')}">آخر 30 يوم</button>
-                                <button onclick="setProductReportDatePreset('this_month')" class="${presetBtnClass('this_month')}">هذا الشهر</button>
-                                <button onclick="setProductReportDatePreset('last_month')" class="${presetBtnClass('last_month')}">الشهر الماضي</button>
-                            </div>
+                            <label class="block font-black text-slate-800 text-xs mb-1 flex items-center gap-1">
+                                <span class="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[9px] font-bold">2</span>
+                                <span>الفئة / التصنيف:</span>
+                            </label>
+                            <select onchange="setProductReportCategory(this.value)" class="w-full bg-white border border-slate-300 rounded-xl p-2.5 font-bold text-xs sm:text-sm text-slate-900 focus:outline-blue-500 shadow-2xs cursor-pointer">
+                                <option value="all" ${curCat === 'all' ? 'selected' : ''}>🏷️ جميع الفئات (${whIngredients.length} صنف)</option>
+                                ${availableCategories.map(c => {
+                                    const count = whIngredients.filter(i => i.categoryId === c.id).length;
+                                    return `<option value="${c.id}" ${curCat === c.id ? 'selected' : ''}>🏷️ ${c.name} (${count})</option>`;
+                                }).join('')}
+                            </select>
+                        </div>
+
+                        <!-- Step 3: Product Selector -->
+                        <div>
+                            <label class="block font-black text-slate-800 text-xs mb-1 flex items-center gap-1">
+                                <span class="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[9px] font-bold">3</span>
+                                <span>اختيار المنتج للتتبع:</span>
+                            </label>
+                            <select onchange="setProductReportItem(this.value)" class="w-full bg-white border-2 border-blue-600 rounded-xl p-2.5 font-black text-xs sm:text-sm text-blue-950 focus:outline-blue-700 shadow-xs cursor-pointer">
+                                ${categoryFilteredItems.map(i => `
+                                    <option value="${i.id}" ${i.id === item.id ? 'selected' : ''}>📦 ${i.name}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <!-- Date Presets & Custom Range -->
+                    <div class="pt-3 border-t border-blue-100 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
+                        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
+                            <span class="text-slate-500 text-xs font-bold whitespace-nowrap">📅 الفترة:</span>
+                            <button onclick="setProductReportDatePreset('all')" class="${presetBtnClass('all')}">كافة الفترات</button>
+                            <button onclick="setProductReportDatePreset('today')" class="${presetBtnClass('today')}">اليوم</button>
+                            <button onclick="setProductReportDatePreset('week')" class="${presetBtnClass('week')}">آخر 7 أيام</button>
+                            <button onclick="setProductReportDatePreset('month')" class="${presetBtnClass('month')}">آخر 30 يوم</button>
+                            <button onclick="setProductReportDatePreset('this_month')" class="${presetBtnClass('this_month')}">هذا الشهر</button>
+                            <button onclick="setProductReportDatePreset('last_month')" class="${presetBtnClass('last_month')}">الشهر الماضي</button>
+                        </div>
+
+                        <!-- Custom Date Pickers -->
+                        <div class="flex flex-wrap items-center gap-2 text-xs font-bold">
+                            <span class="text-slate-500">فترة مخصصة:</span>
+                            <input type="date" id="report-from-date" value="${window.activeReportFromDate}" class="bg-white border border-slate-300 rounded-xl px-2.5 py-1 text-slate-800 text-xs font-bold">
+                            <span class="text-slate-500">إلى</span>
+                            <input type="date" id="report-to-date" value="${window.activeReportToDate}" class="bg-white border border-slate-300 rounded-xl px-2.5 py-1 text-slate-800 text-xs font-bold">
+                            <button onclick="applyCustomProductReportDates()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1 rounded-xl shadow-2xs transition cursor-pointer">
+                                تطبيق 🔍
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Custom Date Pickers -->
-                    <div class="flex flex-wrap items-center gap-3 pt-2 border-t border-slate-200/80 text-xs font-bold">
-                        <span class="text-slate-500">🗓️ أو حدد فترة مخصصة:</span>
-                        <div class="flex items-center gap-2">
-                            <span class="text-slate-600">من:</span>
-                            <input type="date" id="report-from-date" value="${window.activeReportFromDate}" class="bg-white border border-slate-300 rounded-xl px-2.5 py-1 text-slate-800 text-xs font-bold">
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-slate-600">إلى:</span>
-                            <input type="date" id="report-to-date" value="${window.activeReportToDate}" class="bg-white border border-slate-300 rounded-xl px-2.5 py-1 text-slate-800 text-xs font-bold">
-                        </div>
-                        <button onclick="applyCustomProductReportDates()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3.5 py-1.5 rounded-xl shadow-2xs transition cursor-pointer">
-                            🔍 تطبيق الفترة
-                        </button>
-                    </div>
                 </div>
 
-                <!-- 3. KPI Metrics Summary Cards -->
+                <!-- 3. KPI Metrics Summary Cards (Clean unit names) -->
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+                    
                     <!-- Purchases KPI -->
-                    <div class="bg-indigo-50/60 border border-indigo-200 rounded-2xl p-4">
+                    <div class="bg-indigo-50/70 border border-indigo-200 rounded-2xl p-4">
                         <div class="flex items-center gap-2 text-indigo-800 font-bold text-xs">
                             <span>🛒</span> <span>إجمالي المشتريات</span>
                         </div>
@@ -4413,7 +4541,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
 
                     <!-- Recipe Consumption KPI -->
-                    <div class="bg-emerald-50/60 border border-emerald-200 rounded-2xl p-4">
+                    <div class="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4">
                         <div class="flex items-center gap-2 text-emerald-800 font-bold text-xs">
                             <span>👨‍🍳</span> <span>استهلاك الوصفات</span>
                         </div>
@@ -4421,12 +4549,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                             ${totalRecipeConsumedQty.toFixed(2)} ${unitName}
                         </div>
                         <div class="text-[11px] text-emerald-700 font-bold mt-0.5">
-                            في (${recipeBreakdown.filter(r => r.totalPortions > 0).length}) وصفات منجزة
+                            في (${recipeBreakdown.length}) وصفات منجزة
                         </div>
                     </div>
 
                     <!-- Waste KPI -->
-                    <div class="bg-rose-50/60 border border-rose-200 rounded-2xl p-4">
+                    <div class="bg-rose-50/70 border border-rose-200 rounded-2xl p-4">
                         <div class="flex items-center gap-2 text-rose-800 font-bold text-xs">
                             <span>🗑️</span> <span>الهدر والتالف</span>
                         </div>
@@ -4439,7 +4567,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
 
                     <!-- Shelf Transfers KPI -->
-                    <div class="bg-amber-50/60 border border-amber-200 rounded-2xl p-4">
+                    <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-4">
                         <div class="flex items-center gap-2 text-amber-800 font-bold text-xs">
                             <span>🚚</span> <span>المنقول للأرفف</span>
                         </div>
@@ -4451,211 +4579,202 @@ document.addEventListener('DOMContentLoaded', async () => {
                         </div>
                     </div>
 
-                    <!-- Current Warehouse Balance KPI -->
-                    <div class="bg-slate-100 border border-slate-200 rounded-2xl p-4 col-span-2 sm:col-span-1">
-                        <div class="flex items-center gap-2 text-slate-700 font-bold text-xs">
+                    <!-- Current Remaining Stock KPI -->
+                    <div class="bg-blue-50/70 border border-blue-200 rounded-2xl p-4 col-span-2 sm:col-span-1">
+                        <div class="flex items-center gap-2 text-blue-800 font-bold text-xs">
                             <span>🏬</span> <span>الرصيد الفعلي الحالي</span>
                         </div>
-                        <div class="text-lg sm:text-xl font-black text-slate-900 mt-1">
-                            ${currentRemaining} ${unitName}
+                        <div class="text-lg sm:text-xl font-black text-blue-950 mt-1">
+                            ${currentRemaining.toFixed(2)} ${unitName}
                         </div>
-                        <div class="text-[11px] text-slate-500 font-bold mt-0.5">
-                            ${item.archived ? '🗄️ مادة مؤرشفة' : '✅ نشط بالمخزن'}
+                        <div class="text-[11px] text-blue-700 font-bold mt-0.5 flex items-center gap-1">
+                            <span>نشط بالمخزن ✅</span>
                         </div>
                     </div>
+
                 </div>
 
-                <!-- 4. Section: Recipe Consumption Breakdown (أين ذهب المنتج وكم استهلكت كل وصفة) -->
-                <div class="border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">👨‍🍳</span>
-                            <div>
-                                <h4 class="font-black text-slate-900 text-sm sm:text-base">تحليل استهلاك المنتج في الوصفات وقوائم الطعام</h4>
-                                <p class="text-xs text-slate-500">تفصيل دقيق لكل وصفة استخدمت هذه المادة، كمية الحصة، عدد الطلبات المنفذة، وإجمالي الكمية المستهلكة</p>
-                            </div>
+                <!-- 4. Detailed Breakdown Sections (Purchases, Recipe Breakdown, Waste, Transfers) -->
+                <div class="space-y-6 pt-2">
+                    
+                    <!-- Section A: Purchases Breakdown Table -->
+                    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xs">
+                        <div class="p-3.5 bg-indigo-50/80 border-b border-indigo-100 flex items-center justify-between">
+                            <span class="font-black text-xs sm:text-sm text-indigo-950 flex items-center gap-1.5">
+                                <span>🛒</span> <span>سجل مشتريات وتوريد (${item.name}) خلال الفترة:</span>
+                            </span>
+                            <span class="badge-pill bg-indigo-600 text-white text-[10px] font-bold">
+                                ${relevantPurchases.length} عمليات توريد
+                            </span>
                         </div>
-                        <span class="badge-pill bg-emerald-50 text-emerald-800 font-bold text-xs">إجمالي المستهلك: ${totalRecipeConsumedQty.toFixed(2)} ${unitName}</span>
-                    </div>
-
-                    <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-2xs">
-                        <table class="w-full text-right text-xs">
-                            <thead class="bg-emerald-50/70 text-emerald-950 font-black border-b border-emerald-200">
-                                <tr>
-                                    <th class="px-4 py-3">اسم الوصفة / الطبق</th>
-                                    <th class="px-4 py-3">الكمية المطلوبة في الحصة الواحدة</th>
-                                    <th class="px-4 py-3">عدد الطلبات / الحصص المحضرة بالفترة</th>
-                                    <th class="px-4 py-3 font-black text-emerald-950">إجمالي المستهلك لهذه الوصفة</th>
-                                    <th class="px-4 py-3">% من إجمالي الاستهلاك</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100 font-medium">
-                                ${recipeBreakdown.length === 0 ? `
-                                    <tr>
-                                        <td colspan="5" class="text-center py-6 text-slate-400 font-bold">
-                                            لا توجد وصفات جاهزة مسجلة تستهلك هذه المادة حالياً.
-                                        </td>
-                                    </tr>
-                                ` : recipeBreakdown.map(rb => `
-                                    <tr class="hover:bg-emerald-50/20 transition">
-                                        <td class="px-4 py-3 font-black text-slate-900 text-sm">🍽️ ${rb.recipeName}</td>
-                                        <td class="px-4 py-3 font-bold text-slate-700">${rb.qtyPerPortion} ${rb.unit} / حصة</td>
-                                        <td class="px-4 py-3 font-black text-slate-800">${rb.totalPortions} طلب</td>
-                                        <td class="px-4 py-3 font-black text-emerald-800 text-sm">${rb.consumedQty.toFixed(2)} ${unitName}</td>
-                                        <td class="px-4 py-3">
-                                            <div class="flex items-center gap-2">
-                                                <div class="w-16 bg-slate-200 rounded-full h-2 overflow-hidden">
-                                                    <div class="bg-emerald-500 h-2 rounded-full" style="width: ${rb.percentage}%"></div>
-                                                </div>
-                                                <span class="font-bold text-slate-700 text-xs">${rb.percentage}%</span>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- 5. Section: Purchases Log (متى تم شراء المادة والفواتير) -->
-                <div class="border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">🛒</span>
-                            <div>
-                                <h4 class="font-black text-slate-900 text-sm sm:text-base">سجل وتواريخ شراء وتوريد المادة (Purchases Inflow)</h4>
-                                <p class="text-xs text-slate-500">تواريخ الشراء، أسماء الموردين، أرقام الفواتير، والأسعار</p>
-                            </div>
-                        </div>
-                        <span class="badge-pill bg-indigo-50 text-indigo-800 font-bold text-xs">إجمالي الوارد: ${totalPurchasedQty.toFixed(2)} ${unitName}</span>
-                    </div>
-
-                    <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-2xs">
-                        <table class="w-full text-right text-xs">
-                            <thead class="bg-indigo-50/70 text-indigo-950 font-black border-b border-indigo-200">
-                                <tr>
-                                    <th class="px-4 py-3">التاريخ</th>
-                                    <th class="px-4 py-3">المورد</th>
-                                    <th class="px-4 py-3">رقم الفاتورة / الشحنة</th>
-                                    <th class="px-4 py-3">الكمية المشتراة</th>
-                                    <th class="px-4 py-3">سعر الوحدة</th>
-                                    <th class="px-4 py-3">الإجمالي</th>
-                                    <th class="px-4 py-3">تاريخ الانتهاء</th>
-                                    <th class="px-4 py-3">المسجل</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100 font-medium">
-                                ${relevantPurchases.length === 0 ? `
-                                    <tr>
-                                        <td colspan="8" class="text-center py-6 text-slate-400 font-bold">
-                                            لا توجد حركات شراء مسجلة لهذه المادة في الفترة المحددة.
-                                        </td>
-                                    </tr>
-                                ` : relevantPurchases.map(p => `
-                                    <tr class="hover:bg-indigo-50/20 transition">
-                                        <td class="px-4 py-3 font-bold text-slate-600" dir="ltr">${new Date(p.date).toLocaleDateString('ar-OM')}</td>
-                                        <td class="px-4 py-3 font-black text-slate-900">🏢 ${p.supplier}</td>
-                                        <td class="px-4 py-3 font-mono font-bold text-indigo-700">${p.invoiceNumber}</td>
-                                        <td class="px-4 py-3 font-black text-indigo-950 text-sm">${p.quantity} ${unitName}</td>
-                                        <td class="px-4 py-3 font-bold text-slate-700">${p.unitPrice} ر.ع</td>
-                                        <td class="px-4 py-3 font-black text-indigo-900">${p.totalCost} ر.ع</td>
-                                        <td class="px-4 py-3 text-slate-500">${p.expiryDate}</td>
-                                        <td class="px-4 py-3 font-bold text-slate-600">👤 ${p.buyer}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- 6. Section: Waste & Damage Log (الهدر والتلفيات المسجلة) -->
-                <div class="border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="w-8 h-8 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-sm">🗑️</span>
-                            <div>
-                                <h4 class="font-black text-slate-900 text-sm sm:text-base">سجل الهدر والتلفيات المسجلة للمادة (Waste & Losses)</h4>
-                                <p class="text-xs text-slate-500">الكميات التالفة وأسباب الهدر وتواريخ تسجيلها</p>
-                            </div>
-                        </div>
-                        <span class="badge-pill bg-rose-50 text-rose-800 font-bold text-xs">إجمالي التالف: ${totalWastedQty.toFixed(2)} ${unitName}</span>
-                    </div>
-
-                    <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-2xs">
-                        <table class="w-full text-right text-xs">
-                            <thead class="bg-rose-50/70 text-rose-950 font-black border-b border-rose-200">
-                                <tr>
-                                    <th class="px-4 py-3">التاريخ</th>
-                                    <th class="px-4 py-3">الكمية التالفة</th>
-                                    <th class="px-4 py-3">سبب التلف / الهدر</th>
-                                    <th class="px-4 py-3">المسؤول عن التسجيل</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100 font-medium">
-                                ${relevantWaste.length === 0 ? `
-                                    <tr>
-                                        <td colspan="4" class="text-center py-6 text-slate-400 font-bold">
-                                            ✅ لم يتم تسجيل أي تلفيات أو هدر لهذه المادة في الفترة المحددة.
-                                        </td>
-                                    </tr>
-                                ` : relevantWaste.map(w => `
-                                    <tr class="hover:bg-rose-50/20 transition">
-                                        <td class="px-4 py-3 font-bold text-slate-600" dir="ltr">${new Date(w.date).toLocaleDateString('ar-OM')}</td>
-                                        <td class="px-4 py-3 font-black text-rose-700 text-sm">${w.quantity} ${unitName}</td>
-                                        <td class="px-4 py-3 font-bold text-slate-800">${w.reason}</td>
-                                        <td class="px-4 py-3 font-bold text-slate-600">👤 ${w.recorder}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- 7. Section: Shelf Transfers (نقل وتزويد أرفف المحلات) -->
-                ${relevantTransfers.length > 0 ? `
-                    <div class="border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-sm">🚚</span>
-                                <div>
-                                    <h4 class="font-black text-slate-900 text-sm sm:text-base">سجل النقل والتوريد لرفوف المحلات (طحنه / كثيب / زعفل)</h4>
-                                    <p class="text-xs text-slate-500">حركات النقل المنفذة من مخزن المشتريات الخارجية للأرفف مع فحص المطابقة وأسباب الفروقات</p>
-                                </div>
-                            </div>
-                            <span class="badge-pill bg-amber-50 text-amber-800 font-bold text-xs">إجمالي المنقول: ${totalTransferredQty.toFixed(2)} ${unitName}</span>
-                        </div>
-
-                        <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-2xs">
+                        <div class="overflow-x-auto">
                             <table class="w-full text-right text-xs">
-                                <thead class="bg-amber-50/70 text-amber-950 font-black border-b border-amber-200">
+                                <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
                                     <tr>
-                                        <th class="px-4 py-3">التاريخ والوقت</th>
-                                        <th class="px-4 py-3">المحل / الرف</th>
-                                        <th class="px-4 py-3">الكمية المسحوبة</th>
-                                        <th class="px-4 py-3">الرصيد الفعلي قبل السحب</th>
-                                        <th class="px-4 py-3">ملاحظات / سبب الفرق</th>
-                                        <th class="px-4 py-3">المسؤول</th>
+                                        <th class="px-4 py-2.5">التاريخ</th>
+                                        <th class="px-4 py-2.5">رقم الفاتورة</th>
+                                        <th class="px-4 py-2.5">الكمية المشتراة</th>
+                                        <th class="px-4 py-2.5">سعر الوحدة</th>
+                                        <th class="px-4 py-2.5">إجمالي المبلغ</th>
+                                        <th class="px-4 py-2.5">تاريخ الانتهاء</th>
+                                        <th class="px-4 py-2.5">المسؤول</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100 font-medium">
-                                    ${relevantTransfers.map(t => `
-                                        <tr class="hover:bg-amber-50/20 transition">
-                                            <td class="px-4 py-3 font-bold text-slate-600" dir="ltr">${new Date(t.date).toLocaleString('ar-OM', { dateStyle: 'short', timeStyle: 'short' })}</td>
-                                            <td class="px-4 py-3 font-bold text-amber-900">🏪 ${t.branchName}</td>
-                                            <td class="px-4 py-3 font-black text-amber-800 text-sm">${t.quantity} ${unitName}</td>
-                                            <td class="px-4 py-3 font-bold text-slate-700">${t.actualBefore} ${unitName}</td>
-                                            <td class="px-4 py-3 text-slate-600">${t.discrepancyReason}</td>
-                                            <td class="px-4 py-3 font-bold text-slate-600">👤 ${t.transferredBy}</td>
+                                    ${relevantPurchases.length === 0 ? `
+                                        <tr>
+                                            <td colspan="7" class="text-center py-6 text-slate-400 font-bold">
+                                                لا توجد مشتريات مسجلة لهذه المادة خلال الفترة المحددة.
+                                            </td>
+                                        </tr>
+                                    ` : relevantPurchases.map(p => `
+                                        <tr class="hover:bg-indigo-50/30 transition">
+                                            <td class="px-4 py-2.5 font-bold text-slate-700" dir="ltr">${new Date(p.date).toLocaleDateString('ar-OM')}</td>
+                                            <td class="px-4 py-2.5 font-mono font-bold text-indigo-900">${p.invoiceNumber}</td>
+                                            <td class="px-4 py-2.5 font-bold text-slate-900">${p.quantity} ${unitName}</td>
+                                            <td class="px-4 py-2.5 font-mono text-slate-700">${p.unitPrice} ر.ع</td>
+                                            <td class="px-4 py-2.5 font-mono font-black text-indigo-800">${p.totalCost} ر.ع</td>
+                                            <td class="px-4 py-2.5 font-bold text-slate-600">${p.expiryDate}</td>
+                                            <td class="px-4 py-2.5 text-slate-600">${p.buyer}</td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                ` : ''}
+
+                    <!-- Section B: Recipe Consumption Breakdown -->
+                    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xs">
+                        <div class="p-3.5 bg-emerald-50/80 border-b border-emerald-100 flex items-center justify-between">
+                            <span class="font-black text-xs sm:text-sm text-emerald-950 flex items-center gap-1.5">
+                                <span>👨‍🍳</span> <span>توزيع استهلاك المادة في الوصفات والمبيعات:</span>
+                            </span>
+                            <span class="badge-pill bg-emerald-600 text-white text-[10px] font-bold">
+                                ${recipeBreakdown.length} وصفات مستخدمة
+                            </span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right text-xs">
+                                <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-4 py-2.5">اسم الوصفة</th>
+                                        <th class="px-4 py-2.5">الكمية لكل وجبة/مقدار</th>
+                                        <th class="px-4 py-2.5">إجمالي الوجبات المباعة</th>
+                                        <th class="px-4 py-2.5">إجمالي الكمية المستهلكة</th>
+                                        <th class="px-4 py-2.5">نسبة الاستهلاك %</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 font-medium">
+                                    ${recipeBreakdown.length === 0 ? `
+                                        <tr>
+                                            <td colspan="5" class="text-center py-6 text-slate-400 font-bold">
+                                                هذه المادة غير مستخدمة في أي وصفة مبيعات حتى الآن.
+                                            </td>
+                                        </tr>
+                                    ` : recipeBreakdown.map(rb => `
+                                        <tr class="hover:bg-emerald-50/30 transition">
+                                            <td class="px-4 py-2.5 font-black text-slate-900">${rb.recipeName}</td>
+                                            <td class="px-4 py-2.5 font-bold text-slate-700">${rb.qtyPerPortion} ${rb.unit}</td>
+                                            <td class="px-4 py-2.5 font-bold text-emerald-800">${rb.totalPortions} وجبة</td>
+                                            <td class="px-4 py-2.5 font-black text-emerald-900">${rb.consumedQty.toFixed(2)} ${rb.unit}</td>
+                                            <td class="px-4 py-2.5">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-16 bg-slate-100 rounded-full h-2 overflow-hidden">
+                                                        <div class="bg-emerald-500 h-2 rounded-full" style="width: ${rb.percentage}%"></div>
+                                                    </div>
+                                                    <span class="font-bold text-[11px] text-slate-700">${rb.percentage}%</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Section C: Waste & Shelf Transfers Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        
+                        <!-- Waste Records -->
+                        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xs">
+                            <div class="p-3.5 bg-rose-50/80 border-b border-rose-100 flex items-center justify-between">
+                                <span class="font-black text-xs text-rose-950 flex items-center gap-1.5">
+                                    <span>🗑️</span> <span>سجل الهدر والتالف:</span>
+                                </span>
+                                <span class="badge-pill bg-rose-600 text-white text-[10px] font-bold">
+                                    ${relevantWaste.length} تالف
+                                </span>
+                            </div>
+                            <div class="overflow-x-auto max-h-56 overflow-y-auto">
+                                <table class="w-full text-right text-xs">
+                                    <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 sticky top-0">
+                                        <tr>
+                                            <th class="px-3 py-2">التاريخ</th>
+                                            <th class="px-3 py-2">الكمية</th>
+                                            <th class="px-3 py-2">السبب</th>
+                                            <th class="px-3 py-2">المسؤول</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100 font-medium">
+                                        ${relevantWaste.length === 0 ? `
+                                            <tr><td colspan="4" class="text-center py-6 text-slate-400 font-bold">لا يوجد هدر مسجل لهذه المادة ✅</td></tr>
+                                        ` : relevantWaste.map(w => `
+                                            <tr class="hover:bg-rose-50/30 transition">
+                                                <td class="px-3 py-2 font-bold text-slate-700" dir="ltr">${new Date(w.date).toLocaleDateString('ar-OM')}</td>
+                                                <td class="px-3 py-2 font-black text-rose-800">${w.quantity} ${unitName}</td>
+                                                <td class="px-3 py-2 text-slate-700">${w.reason}</td>
+                                                <td class="px-3 py-2 text-slate-500">${w.recorder}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Shelf Transfers -->
+                        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xs">
+                            <div class="p-3.5 bg-amber-50/80 border-b border-amber-100 flex items-center justify-between">
+                                <span class="font-black text-xs text-amber-950 flex items-center gap-1.5">
+                                    <span>🚚</span> <span>سجل النقل وتزويد الأرفف:</span>
+                                </span>
+                                <span class="badge-pill bg-amber-600 text-white text-[10px] font-bold">
+                                    ${relevantTransfers.length} سحب
+                                </span>
+                            </div>
+                            <div class="overflow-x-auto max-h-56 overflow-y-auto">
+                                <table class="w-full text-right text-xs">
+                                    <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 sticky top-0">
+                                        <tr>
+                                            <th class="px-3 py-2">التاريخ</th>
+                                            <th class="px-3 py-2">المحل</th>
+                                            <th class="px-3 py-2">الكمية</th>
+                                            <th class="px-3 py-2">المسؤول</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100 font-medium">
+                                        ${relevantTransfers.length === 0 ? `
+                                            <tr><td colspan="4" class="text-center py-6 text-slate-400 font-bold">لا توجد حركات سحب للأرفف مسجلة.</td></tr>
+                                        ` : relevantTransfers.map(t => `
+                                            <tr class="hover:bg-amber-50/30 transition">
+                                                <td class="px-3 py-2 font-bold text-slate-700" dir="ltr">${new Date(t.date).toLocaleDateString('ar-OM')}</td>
+                                                <td class="px-3 py-2 font-bold text-amber-950">${t.branchName}</td>
+                                                <td class="px-3 py-2 font-black text-amber-900">${t.quantity} ${unitName}</td>
+                                                <td class="px-3 py-2 text-slate-500">${t.transferredBy}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
             </div>
         `;
     }
+
 
     // Open Edit Category Modal
     window.openEditCategoryModal = function(catId) {
@@ -5016,18 +5135,128 @@ document.addEventListener('DOMContentLoaded', async () => {
         openModal('add-recipe-modal');
     };
 
-    function addRecipeIngredientRow(selectedId = '', qty = '') {
-        const ingredients = Store.getIngredients();
+        // --- Helper to clean unit string ---
+    function formatRecipeCleanUnit(u) {
+        if (!u) return 'حبة';
+        let str = String(u);
+        if (str.startsWith('unit_')) str = str.replace('unit_', '');
+        if (typeof getI18nText === 'function') {
+            const tr = getI18nText('unit_' + str);
+            if (tr && !tr.startsWith('unit_')) return tr;
+        }
+        return str;
+    }
+
+    function addRecipeIngredientRow(selectedId = '', qty = '', preselectedCatId = '') {
+        const ingredients = Store.getIngredients().filter(i => !i.archived);
+        const categories = Store.getCategories();
+        const rowId = 'rec-row-' + Date.now() + Math.random().toString(36).substr(2, 4);
+
+        // Find initial ingredient if editing
+        let initialIng = selectedId ? ingredients.find(i => i.id === selectedId) : null;
+        let initialCatId = preselectedCatId || (initialIng ? initialIng.categoryId : 'all');
+
         const row = document.createElement('div');
-        row.className = 'flex gap-2 items-center recipe-ing-row';
+        row.className = 'p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5 text-xs recipe-ing-row shadow-2xs transition hover:border-indigo-300';
+        row.id = rowId;
+
+        // Filter ingredients for initial category
+        let filteredIngs = initialCatId === 'all' 
+            ? ingredients 
+            : ingredients.filter(i => i.categoryId === initialCatId);
+
+        if (filteredIngs.length === 0) filteredIngs = ingredients;
+        if (!initialIng && filteredIngs.length > 0) initialIng = filteredIngs[0];
+
+        const initialUnit = initialIng ? formatRecipeCleanUnit(initialIng.unit) : 'حبة';
+
         row.innerHTML = `
-            <select class="recipe-ing-select flex-1 bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs sm:text-sm" required>
-                ${ingredients.map(i => `<option value="${i.id}" ${i.id === selectedId ? 'selected' : ''}>${i.name} (${getI18nText('unit_' + i.unit)})</option>`).join('')}
-            </select>
-            <input type="number" step="0.01" min="0.01" value="${qty}" placeholder="الكمية" class="recipe-ing-qty w-24 bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs sm:text-sm font-bold" required>
-            <button type="button" class="text-rose-500 hover:text-rose-700 font-bold px-2 cursor-pointer" onclick="this.parentElement.remove()">✕</button>
+            <div class="flex items-center justify-between pb-1.5 border-b border-slate-200">
+                <span class="font-black text-slate-800 flex items-center gap-1.5">
+                    <span>🌾</span> <span>مادة خام للوصفة</span>
+                </span>
+                <button type="button" class="text-rose-500 hover:text-rose-700 font-black text-xs px-2 py-0.5 rounded-lg bg-rose-50 hover:bg-rose-100 transition cursor-pointer flex items-center gap-1" onclick="document.getElementById('${rowId}').remove()">
+                    <span>🗑️</span> <span>حذف</span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center">
+                
+                <!-- 1. Category Selector -->
+                <div class="sm:col-span-4">
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">1️⃣ الفئة / التصنيف:</label>
+                    <select class="recipe-cat-select w-full bg-white border border-slate-300 rounded-xl p-2 text-xs font-bold text-slate-900 focus:outline-indigo-500 shadow-2xs cursor-pointer">
+                        <option value="all" ${initialCatId === 'all' ? 'selected' : ''}>🏷️ جميع الفئات (${ingredients.length})</option>
+                        ${categories.map(c => {
+                            const count = ingredients.filter(i => i.categoryId === c.id).length;
+                            if (count === 0) return '';
+                            return `<option value="${c.id}" ${c.id === initialCatId ? 'selected' : ''}>🏷️ ${c.name} (${count})</option>`;
+                        }).join('')}
+                    </select>
+                </div>
+
+                <!-- 2. Product / Ingredient Selector -->
+                <div class="sm:col-span-5">
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">2️⃣ اختيار المادة / المنتج:</label>
+                    <select class="recipe-ing-select w-full bg-white border border-indigo-300 rounded-xl p-2 text-xs font-black text-indigo-950 focus:outline-indigo-600 shadow-2xs cursor-pointer" required>
+                        ${filteredIngs.map(i => {
+                            const uName = formatRecipeCleanUnit(i.unit);
+                            return `<option value="${i.id}" ${i.id === (initialIng ? initialIng.id : selectedId) ? 'selected' : ''} data-unit="${uName}">📦 ${i.name} (${uName})</option>`;
+                        }).join('')}
+                    </select>
+                </div>
+
+                <!-- 3. Quantity Input -->
+                <div class="sm:col-span-3">
+                    <label class="block text-[11px] font-bold text-indigo-900 mb-1">3️⃣ الكمية المطلوبة:</label>
+                    <div class="flex items-center gap-1.5">
+                        <input type="number" step="any" min="0.001" value="${qty}" placeholder="الكمية" class="recipe-ing-qty w-full bg-white border border-slate-300 rounded-xl p-2 text-xs font-black text-slate-900 focus:border-indigo-500 shadow-2xs text-center" required>
+                        <span class="recipe-ing-unit-badge px-2 py-2 rounded-xl bg-indigo-50 border border-indigo-200 text-[11px] font-black text-indigo-800 whitespace-nowrap min-w-[38px] text-center">
+                            ${initialUnit}
+                        </span>
+                    </div>
+                </div>
+
+            </div>
         `;
-        document.getElementById('recipe-ingredients-list').appendChild(row);
+
+        const container = document.getElementById('recipe-ingredients-list');
+        if (container) container.appendChild(row);
+
+        // Attach dynamic category change listener
+        const catSelect = row.querySelector('.recipe-cat-select');
+        const ingSelect = row.querySelector('.recipe-ing-select');
+        const unitBadge = row.querySelector('.recipe-ing-unit-badge');
+
+        catSelect.addEventListener('change', () => {
+            const chosenCat = catSelect.value;
+            const updatedFiltered = chosenCat === 'all'
+                ? ingredients
+                : ingredients.filter(i => i.categoryId === chosenCat);
+
+            if (updatedFiltered.length === 0) {
+                ingSelect.innerHTML = '<option value="">-- لا توجد مواد في هذه الفئة --</option>';
+                if (unitBadge) unitBadge.textContent = '-';
+            } else {
+                ingSelect.innerHTML = updatedFiltered.map(i => {
+                    const uName = formatRecipeCleanUnit(i.unit);
+                    return `<option value="${i.id}" data-unit="${uName}">📦 ${i.name} (${uName})</option>`;
+                }).join('');
+                
+                const firstOpt = updatedFiltered[0];
+                if (unitBadge && firstOpt) {
+                    unitBadge.textContent = formatRecipeCleanUnit(firstOpt.unit);
+                }
+            }
+        });
+
+        ingSelect.addEventListener('change', () => {
+            const selectedOpt = ingSelect.options[ingSelect.selectedIndex];
+            if (selectedOpt && unitBadge) {
+                const u = selectedOpt.getAttribute('data-unit') || '';
+                unitBadge.textContent = u;
+            }
+        });
     }
 
     document.getElementById('add-recipe-ing-btn')?.addEventListener('click', () => addRecipeIngredientRow());
@@ -6769,16 +6998,123 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('dash-sort-by')?.addEventListener('change', renderDashboard);
 
     // ================= 15. MODAL HELPERS =================
+    window.openAddPurchaseModal = function() {
+        const editId = document.getElementById('pur-edit-id');
+        if (editId) editId.value = '';
+        const imgInput = document.getElementById('pur-invoice-base64');
+        if (imgInput) imgInput.value = '';
+        const previewBox = document.getElementById('pur-image-preview-box');
+        if (previewBox) previewBox.classList.add('hidden');
+        const titleEl = document.getElementById('pur-modal-title');
+        if (titleEl) titleEl.textContent = 'تسجيل فاتورة مشتريات محلية جديدة (بالريال العماني ر.ع)';
+        const formEl = document.getElementById('purchase-form');
+        if (formEl) formEl.reset();
+        
+        const container = document.getElementById('purchase-items-list');
+        if (container) {
+            container.innerHTML = '';
+            if (typeof window.addPurchaseItemRow === 'function') {
+                window.addPurchaseItemRow();
+            }
+        }
+
+        const user = Store.getLoggedInUser();
+        const isAdmin = user && user.role === 'admin';
+        const dateInput = document.getElementById('pur-invoice-date');
+        const dateBadge = document.getElementById('pur-date-admin-badge');
+        const dateHint = document.getElementById('pur-date-hint');
+
+        if (dateInput) {
+            dateInput.value = new Date().toISOString().split('T')[0];
+            if (isAdmin) {
+                dateInput.disabled = false;
+                dateInput.removeAttribute('readonly');
+                if (dateBadge) {
+                    dateBadge.textContent = '👑 صلاحية المسؤول: متاح اختيار أي تاريخ سابق';
+                    dateBadge.className = 'badge-pill bg-emerald-100 text-emerald-800 text-[10px] font-bold';
+                }
+                if (dateHint) dateHint.textContent = 'يمكنك اختيار تاريخ اليوم أو تحديد أي يوم وشهر قديم لتسجيل الفواتير السابقة بدقة';
+            } else {
+                dateInput.disabled = true;
+                dateInput.setAttribute('readonly', 'true');
+                if (dateBadge) {
+                    dateBadge.textContent = '🔒 مقفل على تاريخ اليوم (صلاحية تعديل التاريخ للمسؤول فقط)';
+                    dateBadge.className = 'badge-pill bg-slate-200 text-slate-700 text-[10px] font-bold';
+                }
+                if (dateHint) dateHint.textContent = 'تسجيل فواتير بتواريخ سابقة مخصص لحساب المسؤول والمدير العام فقط';
+            }
+        }
+
+        if (typeof updateInvoiceAutoSummary === 'function') updateInvoiceAutoSummary();
+        openModal('add-purchase-modal');
+    };
+
+    window.openAddConsumablePurchaseModal = function() {
+        const editId = document.getElementById('cons-edit-id');
+        if (editId) editId.value = '';
+        const imgInput = document.getElementById('cons-invoice-base64');
+        if (imgInput) imgInput.value = '';
+        const previewBox = document.getElementById('cons-image-preview-box');
+        if (previewBox) previewBox.classList.add('hidden');
+        const titleEl = document.getElementById('cons-modal-title');
+        if (titleEl) titleEl.textContent = 'تسجيل فاتورة استهلاكية جديدة (بالريال العماني ر.ع)';
+        const formEl = document.getElementById('consumable-purchase-form');
+        if (formEl) formEl.reset();
+
+        const singleMode = document.getElementById('cons-mode-single');
+        if (singleMode) singleMode.checked = true;
+        if (typeof toggleConsumableBranchMode === 'function') toggleConsumableBranchMode('single');
+
+        const user = Store.getLoggedInUser();
+        const isAdmin = user && user.role === 'admin';
+        const dateInput = document.getElementById('cons-invoice-date');
+        const dateBadge = document.getElementById('cons-date-admin-badge');
+        const dateHint = document.getElementById('cons-date-hint');
+
+        if (dateInput) {
+            dateInput.value = new Date().toISOString().split('T')[0];
+            if (isAdmin) {
+                dateInput.disabled = false;
+                dateInput.removeAttribute('readonly');
+                if (dateBadge) {
+                    dateBadge.textContent = '👑 صلاحية المسؤول: متاح اختيار أي تاريخ سابق';
+                    dateBadge.className = 'badge-pill bg-emerald-100 text-emerald-800 text-[10px] font-bold';
+                }
+                if (dateHint) dateHint.textContent = 'يمكنك اختيار تاريخ اليوم أو تحديد أي يوم قديم للفواتير الاستهلاكية';
+            } else {
+                dateInput.disabled = true;
+                dateInput.setAttribute('readonly', 'true');
+                if (dateBadge) {
+                    dateBadge.textContent = '🔒 مقفل على تاريخ اليوم (صلاحية تعديل التاريخ للمسؤول فقط)';
+                    dateBadge.className = 'badge-pill bg-slate-200 text-slate-700 text-[10px] font-bold';
+                }
+                if (dateHint) dateHint.textContent = 'تسجيل فواتير بتواريخ سابقة مخصص لحساب المسؤول والمدير العام فقط';
+            }
+        }
+
+        openModal('add-consumable-purchase-modal');
+    };
+
     window.openModal = function(modalId) {
         const m = document.getElementById(modalId);
         if (m) {
             m.classList.remove('hidden');
             m.style.display = 'flex';
         }
+                if (modalId === 'add-recipe-modal') {
+            const list = document.getElementById('recipe-ingredients-list');
+            if (list && list.children.length === 0) {
+                addRecipeIngredientRow();
+            }
+        }
         if (modalId === 'add-purchase-modal') {
             const container = document.getElementById('purchase-items-list');
             if (container && container.children.length === 0) {
-                addPurchaseItemRow();
+                if (typeof window.addPurchaseItemRow === 'function') {
+                    window.addPurchaseItemRow();
+                } else if (typeof addPurchaseItemRow === 'function') {
+                    addPurchaseItemRow();
+                }
             }
         }
         if (modalId === 'manage-categories-modal') {
@@ -6818,12 +7154,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('warehouse-form')?.reset();
                 const idField = document.getElementById('wh-id');
                 if (idField) idField.value = '';
-            } else if (modalId === 'add-purchase-modal') {
+            } else         if (modalId === 'add-recipe-modal') {
+            const list = document.getElementById('recipe-ingredients-list');
+            if (list && list.children.length === 0) {
+                addRecipeIngredientRow();
+            }
+        }
+        if (modalId === 'add-purchase-modal') {
                 document.getElementById('purchase-form')?.reset();
                 const editIdField = document.getElementById('pur-edit-id');
                 if (editIdField) editIdField.value = '';
                 const modalTitle = document.getElementById('pur-modal-title');
-                if (modalTitle) modalTitle.textContent = 'تسجيل فاتورة مشتريات جديدة (بالريال العماني ر.ع)';
+                if (modalTitle) modalTitle.textContent = 'تسجيل فاتورة مشتريات محلية جديدة (بالريال العماني ر.ع)';
                 const invField = document.getElementById('pur-invoice-base64');
                 if (invField) invField.value = '';
                 const previewBox = document.getElementById('pur-image-preview-box');
@@ -6898,33 +7240,85 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     window.showToast = showToast;
 
-    function getBase64(file) {
+    function getBase64(file, maxWidth = 800, quality = 0.65) {
         return new Promise((resolve, reject) => {
+            if (!file || !file.type || !file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                return;
+            }
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > maxWidth || height > maxWidth) {
+                        if (width > height) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        } else {
+                            width = Math.round((width * maxWidth) / height);
+                            height = maxWidth;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+                    resolve(compressedBase64);
+                };
+                img.onerror = () => resolve(e.target.result);
+            };
             reader.onerror = error => reject(error);
         });
     }
 
-    // ================= 16. MASTER RENDER =================
+    // ================= 16. MASTER RENDER (HIGH-SPEED LAZY RENDERING) =================
     window.renderAll = function() {
-        try { renderActiveUserHeader(); } catch (e) { console.error("header err", e); }
-        try { renderDropdowns(); } catch (e) { console.error("dropdowns err", e); }
-        try { renderDashboard(); } catch (e) { console.error("dashboard err", e); }
-        try { renderPurchasesTab(); } catch (e) { console.error("purchases err", e); }
-        try { renderExternalPurchasesTab(); } catch (e) { console.error("external purchases err", e); }
-        try { renderProductsTab(); } catch (e) { console.error("products err", e); }
-        try { renderWarehousesTab(); } catch (e) { console.error("warehouses err", e); }
-        try { renderShelvesTab(); } catch (e) { console.error("shelves err", e); }
-        try { renderArchiveTab(); } catch (e) { console.error("archive err", e); }
-        try { renderProductReportTab(); } catch (e) { console.error("product report err", e); }
-        try { renderRecipesTab(); } catch (e) { console.error("recipes err", e); }
-        try { renderOrdersTab(); } catch (e) { console.error("orders err", e); }
-        try { renderUsagePOS(); } catch (e) { console.error("usage err", e); }
-        try { renderWasteTab(); } catch (e) { console.error("waste err", e); }
-        try { renderStocktakeTab(); } catch (e) { console.error("stocktake err", e); }
-        try { renderStaffAndTasks(); } catch (e) { console.error("staff err", e); }
+        try { renderActiveUserHeader(); } catch (e) {}
+        try { renderDropdowns(); } catch (e) {}
+
+        const activeTabId = window.activeNavTab || window.activeMainTab || 'dashboard-tab';
+
+        // Render ONLY the active tab to eliminate lag and make interactions instantaneous!
+        if (activeTabId === 'dashboard-tab') {
+            try { renderDashboard(); } catch (e) {}
+        } else if (activeTabId === 'purchases-tab') {
+            try { renderPurchasesTab(); } catch (e) {}
+        } else if (activeTabId === 'external-purchases-tab') {
+            try { renderExternalPurchasesTab(); } catch (e) {}
+        } else if (activeTabId === 'warehouse-1-tab' || activeTabId === 'warehouse-2-tab') {
+            try { renderWarehousesTab(); } catch (e) {}
+        } else if (activeTabId === 'products-tab') {
+            try { renderProductsTab(); } catch (e) {}
+        } else if (activeTabId === 'shelves-tab') {
+            try { renderShelvesTab(); } catch (e) {}
+        } else if (activeTabId === 'archive-tab') {
+            try { renderArchiveTab(); } catch (e) {}
+        } else if (activeTabId === 'product-report-tab') {
+            try { renderProductReportTab(); } catch (e) {}
+        } else if (activeTabId === 'recipes-tab') {
+            try { renderRecipesTab(); } catch (e) {}
+        } else if (activeTabId === 'orders-tab') {
+            try { renderOrdersTab(); } catch (e) {}
+        } else if (activeTabId === 'pos-tab') {
+            try { renderUsagePOS(); } catch (e) {}
+        } else if (activeTabId === 'waste-tab') {
+            try { renderWasteTab(); } catch (e) {}
+        } else if (activeTabId === 'stocktake-tab') {
+            try { renderStocktakeTab(); } catch (e) {}
+        } else if (activeTabId === 'staff-tab') {
+            try { renderStaffAndTasks(); } catch (e) {}
+        } else {
+            try { renderDashboard(); } catch (e) {}
+        }
     };
 
     // Backup & Restore Handlers
@@ -6974,3 +7368,79 @@ document.addEventListener('DOMContentLoaded', async () => {
         try { renderAll(); } catch(e){}
     });
 });
+
+    // ================= SIDEBAR NAVIGATION & SEARCH HELPERS =================
+    window.toggleSidebarAccordion = function(accId) {
+        const content = document.getElementById(accId + '-content');
+        const chevron = document.getElementById(accId + '-chevron');
+        if (!content) return;
+
+        const isHidden = content.classList.contains('hidden') || content.style.display === 'none';
+        if (isHidden) {
+            content.classList.remove('hidden');
+            content.style.display = 'block';
+            if (chevron) chevron.style.transform = 'rotate(180deg)';
+        } else {
+            content.classList.add('hidden');
+            content.style.display = 'none';
+            if (chevron) chevron.style.transform = 'rotate(0deg)';
+        }
+    };
+
+    window.toggleSidebarMenu = function() {
+        const navContainer = document.getElementById('sidebar-nav-container');
+        const toggleIcon = document.getElementById('mobile-sidebar-toggle-icon');
+        if (!navContainer) return;
+
+        if (navContainer.classList.contains('hidden') || navContainer.style.display === 'none') {
+            navContainer.classList.remove('hidden');
+            navContainer.style.display = 'block';
+            navContainer.classList.add('mobile-open');
+            if (toggleIcon) toggleIcon.textContent = '✕';
+        } else {
+            navContainer.classList.add('hidden');
+            navContainer.style.display = 'none';
+            navContainer.classList.remove('mobile-open');
+            if (toggleIcon) toggleIcon.textContent = '☰';
+        }
+    };
+
+    window.filterSidebarNav = function(query) {
+        const q = (query || '').trim().toLowerCase();
+        const navBtns = document.querySelectorAll('.sidebar-nav-btn');
+        const accordions = document.querySelectorAll('.sidebar-accordion');
+        const groups = document.querySelectorAll('.nav-group');
+
+        if (!q) {
+            navBtns.forEach(btn => btn.style.display = 'flex');
+            accordions.forEach(acc => {
+                const content = acc.querySelector('[id$="-content"]');
+                if (content) {
+                    content.classList.remove('hidden');
+                    content.style.display = 'block';
+                }
+            });
+            groups.forEach(g => g.style.display = 'block');
+            return;
+        }
+
+        navBtns.forEach(btn => {
+            const text = (btn.textContent || '').toLowerCase();
+            const match = text.includes(q);
+            btn.style.display = match ? 'flex' : 'none';
+
+            // If match inside accordion, make sure accordion is open
+            if (match) {
+                const parentAccordion = btn.closest('.sidebar-accordion');
+                if (parentAccordion) {
+                    const content = parentAccordion.querySelector('[id$="-content"]');
+                    if (content) {
+                        content.classList.remove('hidden');
+                        content.style.display = 'block';
+                    }
+                }
+            }
+        });
+    };
+
+    

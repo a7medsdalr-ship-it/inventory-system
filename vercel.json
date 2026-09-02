@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "name": "inventory-system",
+  "cleanUrls": true,
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
+}

@@ -12,11 +12,12 @@ const translations = {
         
         // Navigation Tabs
         tabDashboard: "لوحة التحكم",
-        tabPurchases: "المشتريات",
-        tabExternalPurchases: "مشتريات خارجية",
+        tabPurchasesDropdown: "إدارة المشتريات",
+        tabPurchases: "المشتريات المحلية",
+        tabExternalPurchases: "المشتريات الخارجية",
         tabProducts: "إضافة منتج",
-        tabWarehouse1: "مخزن 1",
-        tabWarehouse2: "ستور 2",
+        tabWarehouse1: "مخزن المشتريات المحلية",
+        tabWarehouse2: "مخزن المشتريات الخارجية",
         tabRecipes: "الوصفات",
         tabOrders: "تقديم طلب (المطبخ)",
         tabUsage: "الكاشير (الاستهلاك)",
@@ -31,8 +32,8 @@ const translations = {
         branch_zafal: "زعفل",
 
         // Warehouses
-        warehouse_1: "مخزن 1",
-        warehouse_2: "مخزن 2",
+        warehouse_1: "مخزن المشتريات المحلية",
+        warehouse_2: "مخزن المشتريات الخارجية",
 
         // Dashboard
         dashboardTitle: "نظرة شاملة على المخزون",

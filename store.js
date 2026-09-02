@@ -36,9 +36,18 @@ const Store = {
         }
     },
 
+    _syncTimer: null,
+
     _set(key, data) {
         localStorage.setItem(key, JSON.stringify(data));
-        this._syncToServer();
+        this._debouncedSyncToServer();
+    },
+
+    _debouncedSyncToServer() {
+        if (this._syncTimer) clearTimeout(this._syncTimer);
+        this._syncTimer = setTimeout(() => {
+            this._syncToServer();
+        }, 300);
     },
 
     _isLocalServer() {
@@ -68,7 +77,7 @@ const Store = {
             });
             const syncEl = document.getElementById('sync-indicator');
             if (syncEl) {
-                syncEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> <span class="text-[11px] text-emerald-700 font-bold hidden sm:inline">متزامن لحظياً ✅</span>';
+                syncEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500"></span> <span class="text-[11px] text-emerald-700 font-bold hidden sm:inline">متزامن لحظياً ✅</span>';
             }
         } catch (e) {
             console.log('Sync to server error:', e);
