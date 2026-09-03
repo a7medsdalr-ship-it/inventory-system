@@ -881,5 +881,33 @@ const Store = {
 
     clearAll() {
         Object.values(this.KEYS).forEach(key => localStorage.removeItem(key));
+    },
+
+    // --- Convenient Aliases for Store Methods ---
+    addRecipe(r) { return this.saveRecipe(r); },
+    updateRecipe(r) { return this.saveRecipe(r); },
+    addUsageLog(l) { return this.saveUsageLog(l); },
+    getRawWasteLogs() { return this.getWasteLogs(); },
+    addRawWasteLog(w) { return this.saveWasteLog(w); },
+    addProductionOrder(o) { return this.saveProductionOrder(o); },
+    updateOrderStatus(id, newStatus) {
+        let orders = this.getProductionOrders();
+        const o = orders.find(item => item.id === id);
+        if (o) {
+            o.status = newStatus;
+            this._set(this.KEYS.PRODUCTION_ORDERS, orders);
+        }
+        return o;
+    },
+    updateTaskStatus(id, newStatus) {
+        let tasks = this.getTasks();
+        const t = tasks.find(item => item.id === id);
+        if (t) {
+            t.status = newStatus;
+            this._set(this.KEYS.TASKS, tasks);
+        }
+        return t;
     }
 };
+
+window.Store = Store;
